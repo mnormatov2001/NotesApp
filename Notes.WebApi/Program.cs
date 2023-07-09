@@ -4,6 +4,7 @@ using Notes.Application.Interfaces;
 using Notes.Data;
 using Notes.Data.Extensions;
 using System.Reflection;
+using Notes.WebApi.Middleware;
 
 namespace Notes.WebApi
 {
@@ -37,6 +38,7 @@ namespace Notes.WebApi
             if (app.Environment.IsDevelopment()) 
                 app.UseDeveloperExceptionPage();
 
+            app.UseCustomExceptionHandler();
             app.UseRouting();
             app.UseHttpsRedirection();
             app.UseCors("AllowAll");
