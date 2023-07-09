@@ -1,6 +1,6 @@
 ﻿namespace Notes.Application.Notes.DTOs
 {
-    internal class NotesPage
+    public class NotesPage
     {
         public IList<NoteVm> Notes { get; set; }
         public int PageIndex { get; set; }
