@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Notes.Application.Notes.Commands.CreateNote;
 using Notes.Application.Notes.Commands.DeleteNote;
@@ -20,6 +21,7 @@ namespace Notes.WebApi.Controllers
             _mapper = mapper;
 
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<ActionResult<NoteVm>> GetNote(Guid id)
         {
             var query = new GetNoteQuery
@@ -33,6 +35,7 @@ namespace Notes.WebApi.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize]
         public async Task<ActionResult<Guid>> DeleteNote(Guid id)
         {
             var cmd = new DeleteNoteCommand
@@ -46,6 +49,7 @@ namespace Notes.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<Guid>> UpdateNote([FromBody] UpdateNoteDto updateNoteDto)
         {
             var cmd = _mapper.Map<UpdateNoteCommand>(updateNoteDto);
@@ -55,6 +59,7 @@ namespace Notes.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Guid>> CreateNote([FromBody] CreateNoteDto createNoteDto)
         {
             var cmd = _mapper.Map<CreateNoteCommand>(createNoteDto);
@@ -64,6 +69,7 @@ namespace Notes.WebApi.Controllers
         }
 
         [HttpGet("page")]
+        [Authorize]
         public async Task<ActionResult<NotesPage>> GetNotesPage([FromBody] GetNotesPageDto getNotesPageDto)
         {
             var query = _mapper.Map<GetNotesPageQuery>(getNotesPageDto);
@@ -73,6 +79,7 @@ namespace Notes.WebApi.Controllers
         }
 
         [HttpGet("count")]
+        [Authorize]
         public async Task<ActionResult<int>> GetNotesCount()
         {
             var query = new GetNotesCountQuery { UserId = UserId };
