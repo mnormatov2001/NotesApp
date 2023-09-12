@@ -46,10 +46,24 @@ namespace Notes.WebApi
                     options.RequireHttpsMetadata = false;
                 });
 
+            builder.Services.AddSwaggerGen(options =>
+            {
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
+            });
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment()) 
                 app.UseDeveloperExceptionPage();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(config =>
+            {
+                config.RoutePrefix = string.Empty;
+                config.SwaggerEndpoint("swagger/v1/swagger.json", "notes.app-WebAPI");
+            });
 
             app.UseCustomExceptionHandler();
             app.UseRouting();
