@@ -1,0 +1,84 @@
+﻿.form-contaienr {
+    background: #ffffff;
+    padding: 25px 30px;
+    max-width: 300px;
+    margin: 40px auto;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px 4px lightgray;
+}
+
+a {
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+input {
+    height: auto;
+    border: 1px solid #dfdede;
+    border-radius: 3px;
+    padding: 3px 8px;
+}
+
+input:focus {
+    outline: none;
+    border: 2px solid #c1d9fd;
+}
+
+.register-btn {
+    font-weight: bold;
+    font-size: 16px;
+    height: 40px;
+    background: #247fff;
+    border: 0;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.register-btn:hover {
+    background-color: #0d6cf2;
+}
+
+.label-text {
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.modal-container {
+    border-radius: 5px;
+    padding: 20px 25px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    color: var(--bs-modal-color);
+    pointer-events: auto;
+    background-color: var(--bs-modal-bg);
+    background-clip: padding-box;
+    border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
+    outline: 0;
+}
+
+.my-modal-dialog {
+    max-width: 350px !important;
+}
+
+.my-modal-header {
+    border-bottom: 0 !important;
+    padding: 0 !important;
+}
+
+.btn-close:focus {
+    box-shadow: none !important;
+}
+
+.modal-footer {
+    padding: 0 !important;
+    border-top: 0 !important;
+}
+
+.modal-btn {
+    border-radius: 3px !important;
+}

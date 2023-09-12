@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.IdentityServer.Models;
+using Notes.IdentityServer.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Notes.IdentityServer.Controllers
 {
@@ -10,50 +12,71 @@ namespace Notes.IdentityServer.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
         private readonly IIdentityServerInteractionService _interactionService;
+        private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _configuration;
 
         public AuthController(SignInManager<AppUser> signInManager, 
             UserManager<AppUser> userManager, 
-            IIdentityServerInteractionService interactionService)
+            IIdentityServerInteractionService interactionService, 
+            IEmailSender emailSender, IConfiguration configuration)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _interactionService = interactionService;
+            _emailSender = emailSender;
+            _configuration = configuration;
         }
 
         [HttpGet]
-        public IActionResult Login(string returnUrl)
+        public IActionResult Login([Url] string? redirectUrl)
         {
-            var model = new LoginViewModel { ReturnUrl = returnUrl };
-            return View(model);
+            if (redirectUrl == null || !ModelState.IsValid)
+                redirectUrl = _configuration.GetValue<string>("DefaultRedirectUrl", "https://");
+
+            var loginVm = new LoginViewModel { RedirectUrl = redirectUrl };
+            var passwordResetQueryVm = new PasswordResetQueryViewModel { RedirectUrl = redirectUrl };
+            return View((loginVm, passwordResetQueryVm));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel loginVm)
         {
-            if (!ModelState.IsValid) 
-                return View(model);
+            var passwordResetQueryVm = new PasswordResetQueryViewModel 
+                { Email = loginVm.Email, RedirectUrl = loginVm.RedirectUrl };
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.LoginError = true;
+                return View((loginVm, passwordResetQueryVm));
+            }
+
+            var user = await _userManager.FindByEmailAsync(loginVm.Email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, $"User \"{model.Email}\" not found");
-                return View(model);
+                ViewBag.LoginError = true;
+                ViewBag.EmailNotFoundError = true;
+                return View((loginVm, passwordResetQueryVm));
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, true, false);
+            var result = await _signInManager.PasswordSignInAsync(user, 
+                loginVm.Password, false, false);
             if (!result.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, "Login error");
-                return View(model);
+                ViewBag.LoginError = true;
+                ViewBag.IncorrectPasswordError = true;
+                return View((loginVm, passwordResetQueryVm));
             }
 
-            return Redirect(model.ReturnUrl);
+            return Redirect(loginVm.RedirectUrl);
         }
 
         [HttpGet]
-        public IActionResult Register(string returnUrl)
+        public IActionResult Register([Url] string? redirectUrl)
         {
-            var model = new RegisterViewModel { ReturnUrl = returnUrl };
+            if (redirectUrl == null || !ModelState.IsValid)
+                redirectUrl = _configuration.GetValue<string>("DefaultRedirectUrl", "https://");
+
+            var model = new RegisterViewModel { RedirectUrl = redirectUrl };
             return View(model);
         }
 
@@ -63,16 +86,54 @@ namespace Notes.IdentityServer.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = new AppUser { Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
+            var existUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existUser != null)
             {
-                ModelState.AddModelError(string.Empty, "Registration error");
+                ViewBag.RegistrationError = true;
+                ViewBag.BusyEmailError = true;
                 return View(model);
             }
 
-            await _signInManager.SignInAsync(user, true);
-            return Redirect(model.ReturnUrl);
+            var user = new AppUser
+            {
+                Email = model.Email,
+                UserName = model.Email,
+                EmailConfirmed = false,
+                FirstName = model.FirstName,
+                LastName = model.LastName
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(error.Code, error.Description);
+
+                ViewBag.RegistrationError = true;
+                return View(model);
+            }
+
+            var success = await SendConfirmationEmail(user);
+            ViewBag.ConfirmationEmailSent = success;
+            ViewBag.RegistrationSuccess = true;
+            return View(model);
+        }
+
+        private async Task<bool> SendConfirmationEmail(AppUser user)
+        {
+            var confirmationToken = 
+                await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var callbackUrl = Url.Action("ConfirmEmail", "Auth",
+                new { email = user.Email, confirmationToken = confirmationToken },
+                Request.Scheme);
+
+            var subject = "Подтверждение аккаунта NotesApp";
+            var message = "Добро пожаловать в NotesApp!\n" +
+                          "Подтвердите регистрацию, перейдя по ссылке: " +
+                          $"<a href=\"{callbackUrl}\">{callbackUrl}</a>";
+
+            return await _emailSender.SendEmailAsync(user.Email, subject, message);
         }
 
         [HttpGet]
@@ -82,7 +143,190 @@ namespace Notes.IdentityServer.Controllers
             var logoutRequest = await _interactionService.GetLogoutContextAsync(logoutId);
             if (logoutRequest != null)
                 return Redirect(logoutRequest.PostLogoutRedirectUri);
-            return NoContent();
+            return RedirectToAction("Login", "Auth");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RequestConfirmationEmail(
+            [EmailAddress] string email)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return BadRequest($"\"{email}\" не зарегистрирован.");
+
+            if (user.EmailConfirmed)
+                return Ok($"Почта \"{email}\" уже подтверждена.");
+
+            var success = await SendConfirmationEmail(user);
+            if (!success)
+                return Problem("Внутренняя ошибка сервера - " +
+                               "не удалось отправить письмо подтверждения.");
+
+            return Ok($"Письмо подтверждения отправлено на \"{email}\" .");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(
+            [EmailAddress] string email, 
+            [Required] string confirmationToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Неверная ссылка подтверждения.");
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Неверная ссылка подтверждения.");
+                return BadRequest(ModelState);
+            }
+
+            if (user.EmailConfirmed)
+                return Ok($"Почта \"{email}\" уже подтверждена!");
+
+            var result = await _userManager.ConfirmEmailAsync(user, confirmationToken);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors) 
+                    ModelState.AddModelError(error.Code, error.Description);
+                
+                ModelState.AddModelError(string.Empty, 
+                    "Не удалось подтвердить почту.");
+                return BadRequest(ModelState);
+            }
+            return Ok($"Почта \"{email}\" успешно подтверждена!");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RequestPasswordResetEmail(
+            PasswordResetQueryViewModel model)
+        {
+            var loginVm = new LoginViewModel
+            {
+                Email = model.Email,
+                RedirectUrl = model.RedirectUrl,
+            };
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.CanNotResetPasswordError = true;
+                return View("Login", (loginVm, model));
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ViewBag.CanNotResetPasswordError = true;
+                ViewBag.EmailNotFoundError = true;
+                return View("Login", (loginVm, model));
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                ViewBag.CanNotResetPasswordError = true;
+                ViewBag.EmailNotConfirmedError = true;
+                return View("Login", (loginVm, model));
+            }
+
+            var success = await SendPasswordResetEmail(user);
+            if (!success)
+            {
+                ViewBag.CanNotResetPasswordError = true;
+                ViewBag.SendingEmailError = true;
+            }
+
+            return View("Login", (loginVm, model));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(
+            [EmailAddress] string email,
+            [Required] string passwordResetToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Неверная ссылка для сброса пароля.");
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Неверная ссылка для сброса пароля.");
+                return BadRequest(ModelState);
+            }
+
+            var okay = await _userManager.VerifyUserTokenAsync(user,
+                _userManager.Options.Tokens.PasswordResetTokenProvider,
+                UserManager<AppUser>.ResetPasswordTokenPurpose, passwordResetToken);
+            if (!okay)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Неверная ссылка для сброса пароля.");
+                return BadRequest(ModelState);
+            }
+
+            var model = new ResetPasswordViewModel
+            {
+                Email = email, 
+                PasswordResetToken = passwordResetToken
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Неверная ссылка для сброса пароля.");
+                return BadRequest(ModelState);
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, 
+                model.PasswordResetToken, model.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors) 
+                    ModelState.AddModelError(error.Code, error.Description);
+                
+                ModelState.AddModelError(string.Empty,
+                    "Неверная ссылка для сброса пароля.");
+                return BadRequest(ModelState);
+            }
+
+            return Ok("Новый пароль установлен.");
+        }
+
+        private async Task<bool> SendPasswordResetEmail(AppUser user)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var callbackUrl = Url.Action("ResetPassword", "Auth",
+                new { email = user.Email, passwordResetToken = token },
+                Request.Scheme);
+
+            var subject = "Сброс пароля аккаунта NotesApp";
+            var message = "С возвращением в NotesApp!\n" +
+                          "Для сброса пароля перейдите по ссылке: " +
+                          $"<a href=\"{callbackUrl}\">{callbackUrl}</a>";
+
+            return await _emailSender.SendEmailAsync(user.Email, subject, message);
         }
     }
 }

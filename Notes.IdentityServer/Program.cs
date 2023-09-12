@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Notes.IdentityServer.Data;
 using Notes.IdentityServer.Models;
+using Notes.IdentityServer.Services;
+using Notes.IdentityServer.Services.Interfaces;
 
 namespace Notes.IdentityServer
 {
@@ -18,7 +20,7 @@ namespace Notes.IdentityServer
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(config =>
             {
-                config.Password.RequiredLength = 8;
+                config.Password.RequiredLength = 5;
                 config.Password.RequireNonAlphanumeric = false;
                 config.Password.RequireDigit = false;
                 config.Password.RequireUppercase = false;
@@ -44,6 +46,8 @@ namespace Notes.IdentityServer
 
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -52,8 +56,7 @@ namespace Notes.IdentityServer
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
-                    Path.Combine(app.Environment.ContentRootPath, "Styles")),
-                RequestPath = "/Styles"
+                    Path.Combine(app.Environment.ContentRootPath, "wwwroot"))
             });
 
             app.UseRouting();

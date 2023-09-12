@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.WebApi", "Notes.WebAp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IdentityServer", "IdentityServer", "{FC516CB4-1C74-4F45-A5BB-7822230F92D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notes.IdentityServer", "Notes.IdentityServer\Notes.IdentityServer.csproj", "{FFA5EC75-9ADB-46D5-AE33-F5994E1E4B52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.IdentityServer", "Notes.IdentityServer\Notes.IdentityServer.csproj", "{FFA5EC75-9ADB-46D5-AE33-F5994E1E4B52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

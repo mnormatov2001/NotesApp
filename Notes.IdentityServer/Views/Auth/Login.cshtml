@@ -1,33 +1,84 @@
-﻿@model LoginViewModel
+﻿@model (LoginViewModel LoginVm, PasswordResetQueryViewModel PasswordResetQueryVm)
 
 <!DOCTYPE html>
 
 <html>
 
 <head>
-    <link href=@Url.Content("~/Styles/app.css") rel="stylesheet" type="text/css" />
+  <title>Login</title>
+
+  <link href=@Url.Content("~/css/app.css") rel="stylesheet" type="text/css"/>
+  <link href=@Url.Content("~/css/bootstrap.css") rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
-<form asp-controller="Auth" asp-action="Login" method="post">
-    <input type="hidden" asp-for="ReturnUrl"/>
-    <div class="header">Login</div>
-    <div class="block">
-        <label class="label">Email</label>
-        <input class="input" asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+<div class="container">
+  <div class="row justify-content-center align-items-center">
+    <div class="col-xl-4 col-md-6 col-sm-12">
+      <div class="form-contaienr">
+        <table width="100%" class="mb-2">
+          <tr>
+            <td align="left">
+              <h5>Вход</h5>
+            </td>
+            <td align="right">
+              <h5>
+                <a asp-controller="Auth" asp-action="Register" 
+                   asp-route-redirectUrl="@Model.LoginVm.RedirectUrl">Регистрация</a>
+              </h5>
+            </td>
+          </tr>
+        </table>
+        @{
+          await Html.RenderPartialAsync("LoginForm", Model.LoginVm);
+        }
+      </div>
+
+      @*Modal*@
+      <div class="modal fade" id="ForgotPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog my-modal-dialog">
+          <div class="modal-container">
+            <div class="modal-header my-modal-header mb-2">
+              <h5 class="modal-title">Забыли пароль?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            @{
+              await Html.RenderPartialAsync("ForgotPasswordForm", Model.PasswordResetQueryVm);
+            }
+          </div>
+        </div>
+      </div>
+      @*End Modal*@
+
     </div>
-    <div class="block">
-        <label class="label">Password</label>
-        <input class="input" asp-for="Password"/>
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div class="block">
-        <button class="button" type="submit">Sign in</button>
-    </div>
-        <a asp-controller="Auth" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl"
-           class="switch-button">Register</a>
-</form>
+  </div>
+</div>
+<script src=@Url.Content("~/js/bootstrap.bundle.js")></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    function openModalDialog() {
+      window.$("#ForgotPasswordModal").modal("show");
+    }
+
+    @if (ViewData.ContainsKey("CanNotResetPasswordError") && ViewBag.CanNotResetPasswordError == true)
+    {
+      @:openModalDialog();
+    }
+  });
+
+  var myModal = document.getElementById('ForgotPasswordModal');
+  myModal.addEventListener('hidden.bs.modal',
+    function() {
+      var elements = document.querySelectorAll(["#ForgotPasswordModalErrors",
+        "#LoginFormEmailError",
+        "#LoginFormPasswordError"]);
+      elements.forEach(function (element) {
+        element.setAttribute("hidden", true);
+      });
+    });
+</script>
 </body>
 
 </html>

@@ -1,0 +1,39 @@
+﻿@model LoginViewModel
+
+<form asp-controller="Auth" asp-action="Login" method="post">
+  <div>
+    <input asp-for="RedirectUrl" type="hidden"/>
+    <label class="text-secondary label-text">Адрес электронной почты</label>
+    <input class="w-100" name="Email" type="email" asp-for="Email">
+    
+    <div id="LoginFormEmailError">
+      @if (ViewData.ContainsKey("LoginError") && ViewBag.LoginError == true)
+      {
+        <span class="text-danger label-text" asp-validation-for="Email"></span>
+        @if (ViewData.ContainsKey("EmailNotFoundError") && ViewBag.EmailNotFoundError == true)
+        {
+          <label class="text-danger label-text">*Этот email не зарегистрирован.</label>
+        }
+      }
+    </div>
+
+    <label class="mt-2 text-secondary label-text">Пароль</label>
+    <div class="float-end mt-2">
+      <a class="label-text" data-bs-toggle="modal" data-bs-target="#ForgotPasswordModal">Забыли пароль?</a>
+    </div>
+    <input class="w-100" name="Password" type="password" asp-for="Password">
+    
+    <div id="LoginFormPasswordError">
+      <span class="text-danger label-text" asp-validation-for="Password"></span>
+      @if (ViewData.ContainsKey("LoginError") && ViewBag.LoginError == true)
+      {
+        @if (ViewData.ContainsKey("IncorrectPasswordError") && ViewBag.IncorrectPasswordError == true)
+        {
+          <label class="text-danger label-text">*Неверный пароль.</label>
+        }
+      }
+    </div>
+    
+  </div>
+  <button class="mt-4 w-100 register-btn" type="submit">Войти</button>
+</form>
