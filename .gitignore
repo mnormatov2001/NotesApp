@@ -361,8 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Notes.WebApi/mnormatov2001.Notes.db
-/Notes.WebApi/mnormatov2001.Notes.db-shm
-/Notes.WebApi/mnormatov2001.Notes.db-wal
-/Notes.IdentityServer/mnormatov2001.notesApp.Auth.db
-/Notes.IdentityServer/tempkey.jwk
+
+# SqLite database files
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.jwk
