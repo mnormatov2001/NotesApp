@@ -8,10 +8,12 @@ namespace Notes.IdentityServer.Services
     public class MailKitEmailSender : IEmailSender
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<MailKitEmailSender> _logger;
 
-        public MailKitEmailSender(IConfiguration configuration)
+        public MailKitEmailSender(IConfiguration configuration, ILogger<MailKitEmailSender> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<bool> SendEmailAsync(string emailAddress, string subject, string message)
@@ -38,7 +40,7 @@ namespace Notes.IdentityServer.Services
             }
             catch (Exception e)
             {
-                // log
+                _logger.LogError(e, "Failed to send email.");
                 return await Task.FromResult(false);
             }
 
