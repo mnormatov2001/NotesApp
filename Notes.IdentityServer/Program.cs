@@ -61,7 +61,7 @@ namespace Notes.IdentityServer
 
             app.UseRouting();
             app.UseIdentityServer();
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.MapDefaultControllerRoute();
 
