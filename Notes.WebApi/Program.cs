@@ -5,6 +5,7 @@ using Notes.Data;
 using Notes.Data.Extensions;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 using Notes.WebApi.Middleware;
 
 namespace Notes.WebApi
@@ -51,6 +52,29 @@ namespace Notes.WebApi
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);
+                options.AddSecurityDefinition("AuthToken",
+                    new OpenApiSecurityScheme
+                    {
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        Name = "Authorization",
+                        Description = "Authorization token"
+                    });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "AuthToken"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
 
             var app = builder.Build();
