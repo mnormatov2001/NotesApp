@@ -12,6 +12,7 @@ using Notes.WebApi.Models;
 
 namespace Notes.WebApi.Controllers
 {
+    [Produces("Application/json")]
     [Route("notes.app/[controller]")]
     public class NotesController : BaseApiController
     {
@@ -20,6 +21,19 @@ namespace Notes.WebApi.Controllers
         public NotesController(IMapper mapper) => 
             _mapper = mapper;
 
+        /// <summary>
+        /// Gets the note by id
+        /// </summary>
+        /// <param name="id">Note id (guid)</param>
+        /// <returns>Returns NoteVm</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="404">If the requested note is not found</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("{id:guid}")]
         [Authorize]
         public async Task<ActionResult<NoteVm>> GetNote(Guid id)
@@ -34,6 +48,19 @@ namespace Notes.WebApi.Controllers
             return Ok(noteVm);
         }
 
+        /// <summary>
+        /// Deletes the note by id
+        /// </summary>
+        /// <param name="id">Note id (guid)</param>
+        /// <returns>Returns deleted note id (guid)</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="404">If the requested note is not found</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpDelete("{id:guid}")]
         [Authorize]
         public async Task<ActionResult<Guid>> DeleteNote(Guid id)
@@ -48,6 +75,19 @@ namespace Notes.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Updates the note
+        /// </summary>
+        /// <param name="updateNoteDto"></param>
+        /// <returns>Returns updated note id (guid)</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="404">If the requested note is not found</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPut]
         [Authorize]
         public async Task<ActionResult<Guid>> UpdateNote([FromBody] UpdateNoteDto updateNoteDto)
@@ -58,6 +98,17 @@ namespace Notes.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Creates the note
+        /// </summary>
+        /// <param name="createNoteDto">CreateNoteDto</param>
+        /// <returns>Returns created note id</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<Guid>> CreateNote([FromBody] CreateNoteDto createNoteDto)
@@ -68,6 +119,17 @@ namespace Notes.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets notes page
+        /// </summary>
+        /// <param name="getNotesPageDto">GetNotesPageDto</param>
+        /// <returns>Returns notes page (NotesPage)</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("page")]
         [Authorize]
         public async Task<ActionResult<NotesPage>> GetNotesPage([FromBody] GetNotesPageDto getNotesPageDto)
@@ -78,6 +140,16 @@ namespace Notes.WebApi.Controllers
             return Ok(notesPage);
         }
 
+        /// <summary>
+        /// Gets notes count
+        /// </summary>
+        /// <returns>Returns notes count (int)</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("count")]
         [Authorize]
         public async Task<ActionResult<int>> GetNotesCount()

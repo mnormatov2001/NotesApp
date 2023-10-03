@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 using Notes.Application.Common.Mappings;
 using Notes.Application.Notes.Commands.UpdateNote;
 
@@ -6,8 +7,11 @@ namespace Notes.WebApi.Models
 {
     public class UpdateNoteDto : IMapWith<UpdateNoteCommand>
     {
+        [Required]
         public Guid NoteId { get; set; }
+        [Required]
         public string NoteTitle { get; set; }
+        [Required]
         public string NoteContent { get; set; }
 
         public void Mapping(Profile profile)

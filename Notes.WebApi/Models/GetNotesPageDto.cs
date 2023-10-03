@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using AutoMapper;
 using Notes.Application.Common.Mappings;
 using Notes.Application.Notes.DTOs;
@@ -10,8 +11,23 @@ namespace Notes.WebApi.Models
     {
         public int PageSize { get; set; }
         public int PageIndex { get; set; }
+
+        /// <summary>
+        /// The key by which the collection of notes will be sorted
+        /// </summary>
+        /// <value>CreationDate</value>
+        /// <value>EditDate</value>
+        /// <value>Title</value>
+        [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public SortKey SortKey { get; set; }
+
+        /// <summary>
+        /// Key that specifies the sort direction
+        /// </summary>
+        /// <value>Ascending</value>
+        /// <value>Descending</value>
+        [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public SortOrder SortOrder { get; set; }
 
