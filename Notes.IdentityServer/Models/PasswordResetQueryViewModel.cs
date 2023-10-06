@@ -8,7 +8,6 @@ namespace Notes.IdentityServer.Models
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         public string Email { get; set; }
-        [Url]
-        public string RedirectUrl { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

@@ -13,28 +13,23 @@ namespace Notes.IdentityServer.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IIdentityServerInteractionService _interactionService;
         private readonly IEmailSender _emailSender;
-        private readonly IConfiguration _configuration;
 
         public AuthController(SignInManager<AppUser> signInManager, 
             UserManager<AppUser> userManager, 
             IIdentityServerInteractionService interactionService, 
-            IEmailSender emailSender, IConfiguration configuration)
+            IEmailSender emailSender)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _interactionService = interactionService;
             _emailSender = emailSender;
-            _configuration = configuration;
         }
 
         [HttpGet]
-        public IActionResult Login([Url] string? redirectUrl)
+        public IActionResult Login(string returnUrl)
         {
-            if (redirectUrl == null || !ModelState.IsValid)
-                redirectUrl = _configuration.GetValue<string>("DefaultRedirectUrl", "https://");
-
-            var loginVm = new LoginViewModel { RedirectUrl = redirectUrl };
-            var passwordResetQueryVm = new PasswordResetQueryViewModel { RedirectUrl = redirectUrl };
+            var loginVm = new LoginViewModel { ReturnUrl = returnUrl };
+            var passwordResetQueryVm = new PasswordResetQueryViewModel { ReturnUrl = returnUrl };
             return View((loginVm, passwordResetQueryVm));
         }
 
@@ -42,7 +37,7 @@ namespace Notes.IdentityServer.Controllers
         public async Task<IActionResult> Login(LoginViewModel loginVm)
         {
             var passwordResetQueryVm = new PasswordResetQueryViewModel 
-                { Email = loginVm.Email, RedirectUrl = loginVm.RedirectUrl };
+                { Email = loginVm.Email, ReturnUrl = loginVm.ReturnUrl };
 
             if (!ModelState.IsValid)
             {
@@ -67,16 +62,13 @@ namespace Notes.IdentityServer.Controllers
                 return View((loginVm, passwordResetQueryVm));
             }
 
-            return Redirect(loginVm.RedirectUrl);
+            return Redirect(loginVm.ReturnUrl);
         }
 
         [HttpGet]
-        public IActionResult Register([Url] string? redirectUrl)
+        public IActionResult Register(string returnUrl)
         {
-            if (redirectUrl == null || !ModelState.IsValid)
-                redirectUrl = _configuration.GetValue<string>("DefaultRedirectUrl", "https://");
-
-            var model = new RegisterViewModel { RedirectUrl = redirectUrl };
+            var model = new RegisterViewModel { ReturnUrl = returnUrl };
             return View(model);
         }
 
@@ -211,7 +203,7 @@ namespace Notes.IdentityServer.Controllers
             var loginVm = new LoginViewModel
             {
                 Email = model.Email,
-                RedirectUrl = model.RedirectUrl,
+                ReturnUrl = model.ReturnUrl,
             };
 
             if (!ModelState.IsValid)

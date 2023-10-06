@@ -2,7 +2,7 @@
 
 <form asp-controller="Auth" asp-action="Login" method="post">
   <div>
-    <input asp-for="RedirectUrl" type="hidden"/>
+        <input asp-for="ReturnUrl" name="ReturnUrl" type="hidden" />
     <label class="text-secondary label-text">Адрес электронной почты</label>
     <input class="w-100" name="Email" type="email" asp-for="Email">
     

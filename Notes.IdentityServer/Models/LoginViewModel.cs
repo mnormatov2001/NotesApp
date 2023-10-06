@@ -14,7 +14,6 @@ namespace Notes.IdentityServer.Models
         [RegularExpression(".*[a-z].*",
             ErrorMessage = "*Неверный пароль.")]
         public string Password { get; set; }
-        [Url]
-        public string RedirectUrl { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

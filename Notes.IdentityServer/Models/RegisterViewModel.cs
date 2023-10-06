@@ -25,7 +25,6 @@ namespace Notes.IdentityServer.Models
         [DataType(DataType.Password)]
         [Compare(nameof(Password), ErrorMessage = "*Пароли не совпадают.")]
         public string ConfirmPassword { get; set; }
-        [Url]
-        public string RedirectUrl { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

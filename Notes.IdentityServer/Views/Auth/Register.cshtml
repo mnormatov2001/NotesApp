@@ -22,14 +22,14 @@
             </td>
             <td align="right">
               <h5>
-                <a asp-controller="Auth" asp-action="Login" asp-route-redirectUrl="@Model.RedirectUrl">Вход</a>
+                <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">Вход</a>
               </h5>
             </td>
           </tr>
         </table>
         <form asp-controller="Auth" asp-action="Register" method="post">
           <div>
-            <input asp-for="@Model.RedirectUrl" type="hidden"/>
+            <input asp-for="@Model.ReturnUrl" type="hidden"/>
             <label class="text-secondary label-text">Имя</label>
             <input class="w-100" type="text" asp-for="@Model.FirstName">
             <span class="text-danger label-text" asp-validation-for="@Model.FirstName"></span>
@@ -84,7 +84,7 @@
               }
             
               <div class="float-end align-self-end">
-                <a asp-controller="Auth" asp-action="Login" asp-route-redirectUrl="@Model.RedirectUrl" 
+                <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" 
                    class="btn btn-primary modal-btn">Ok</a>
               </div>
             </div>
