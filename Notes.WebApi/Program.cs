@@ -42,9 +42,10 @@ namespace Notes.WebApi
             })
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = "http://localhost:44384/";
-                    options.Audience = "notes.app.webApi";
-                    options.RequireHttpsMetadata = false;
+                    var cfg = builder.Configuration.GetSection("Authentication");
+                    options.Authority = cfg.GetSection("Authority").Value;
+                    options.Audience = cfg.GetSection("Audience").Value;
+                    options.RequireHttpsMetadata = cfg.GetSection("RequireHttpsMetadata").Get<bool>();
                 });
 
             builder.Services.AddSwaggerGen(options =>
@@ -57,7 +58,7 @@ namespace Notes.WebApi
                     {
                         In = ParameterLocation.Header,
                         Type = SecuritySchemeType.Http,
-                        Scheme = "bearer",
+                        Scheme = "Bearer",
                         Name = "Authorization",
                         Description = "Authorization token"
                     });
