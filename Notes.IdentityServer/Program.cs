@@ -29,12 +29,13 @@ namespace Notes.IdentityServer
                 .AddEntityFrameworkStores<AuthDbContext>()
                 .AddDefaultTokenProviders();
 
+            var cfg = new IdentityServerConfiguration(builder.Configuration);
             builder.Services.AddIdentityServer()
                 .AddAspNetIdentity<AppUser>()
-                .AddInMemoryApiResources(Configuration.ApiResources)
-                .AddInMemoryIdentityResources(Configuration.IdentityResources)
-                .AddInMemoryApiScopes(Configuration.ApiScopes)
-                .AddInMemoryClients(Configuration.Clients)
+                .AddInMemoryApiResources(cfg.ApiResources)
+                .AddInMemoryIdentityResources(cfg.IdentityResources)
+                .AddInMemoryApiScopes(cfg.ApiScopes)
+                .AddInMemoryClients(cfg.Clients)
                 .AddDeveloperSigningCredential();
 
             builder.Services.ConfigureApplicationCookie(config =>
@@ -42,6 +43,7 @@ namespace Notes.IdentityServer
                 config.Cookie.Name = "notesApp.Identity.cooke";
                 config.LoginPath = "/Auth/Login";
                 config.LogoutPath = "/Auth/Logout";
+                config.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
 
             builder.Services.AddControllersWithViews();
