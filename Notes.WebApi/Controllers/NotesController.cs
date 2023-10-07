@@ -132,7 +132,7 @@ namespace Notes.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("page")]
         [Authorize]
-        public async Task<ActionResult<NotesPage>> GetNotesPage([FromBody] GetNotesPageDto getNotesPageDto)
+        public async Task<ActionResult<NotesPage>> GetNotesPage([FromQuery] GetNotesPageDto getNotesPageDto)
         {
             var query = _mapper.Map<GetNotesPageQuery>(getNotesPageDto);
             query.UserId = UserId;
