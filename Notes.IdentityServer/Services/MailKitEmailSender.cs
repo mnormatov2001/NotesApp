@@ -18,8 +18,18 @@ namespace Notes.IdentityServer.Services
 
         public async Task<bool> SendEmailAsync(string emailAddress, string subject, string message)
         {
-            var senderUserName = _configuration.GetSection("SmtpClient")["UserName"];
-            var senderPassword = _configuration.GetSection("SmtpClient")["Password"];
+            var senderUserName = Environment.GetEnvironmentVariable("SMTP_CLIENT_USERNAME");
+            if (senderUserName == null)
+            {
+                _logger.LogError("Failed to get environment variable 'SMTP_CLIENT_USERNAME'.");
+                return false;
+            }
+            var senderPassword = Environment.GetEnvironmentVariable("SMTP_CLIENT_PASSWORD");
+            if (senderPassword == null)
+            {
+                _logger.LogError("Failed to get environment variable 'SMTP_CLIENT_PASSWORD'.");
+                return false;
+            }
             var host = _configuration.GetSection("SmtpClient")["Host"];
             var port = _configuration.GetSection("SmtpClient").GetValue<int>("Port");
             var useSsl = _configuration.GetSection("SmtpClient").GetValue<bool>("UseSsl");
@@ -41,10 +51,10 @@ namespace Notes.IdentityServer.Services
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to send email.");
-                return await Task.FromResult(false);
+                return false;
             }
 
-            return await Task.FromResult(true);
+            return true;
         }
     }
 }
