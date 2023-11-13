@@ -18,24 +18,14 @@ namespace Notes.IdentityServer.Services
 
         public async Task<bool> SendEmailAsync(string emailAddress, string subject, string message)
         {
-            var senderUserName = Environment.GetEnvironmentVariable("SMTP_CLIENT_USERNAME");
-            if (senderUserName == null)
-            {
-                _logger.LogError("Failed to get environment variable 'SMTP_CLIENT_USERNAME'.");
-                return false;
-            }
-            var senderPassword = Environment.GetEnvironmentVariable("SMTP_CLIENT_PASSWORD");
-            if (senderPassword == null)
-            {
-                _logger.LogError("Failed to get environment variable 'SMTP_CLIENT_PASSWORD'.");
-                return false;
-            }
-            var host = _configuration.GetSection("SmtpClient")["Host"];
-            var port = _configuration.GetSection("SmtpClient").GetValue<int>("Port");
-            var useSsl = _configuration.GetSection("SmtpClient").GetValue<bool>("UseSsl");
+            var senderUsername = _configuration["SmtpClient:Username"];
+            var senderPassword = _configuration["SmtpClient:Password"];
+            var host = _configuration["SmtpClient:Host"];
+            var port = _configuration.GetRequiredSection("SmtpClient").GetValue<int>("Port");
+            var useSsl = _configuration.GetRequiredSection("SmtpClient").GetValue<bool>("UseSsl");
 
             using var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("Notes.App", senderUserName));
+            emailMessage.From.Add(new MailboxAddress("Notes.App", senderUsername));
             emailMessage.To.Add(new MailboxAddress("", emailAddress));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(TextFormat.Html) { Text = message };
@@ -44,7 +34,7 @@ namespace Notes.IdentityServer.Services
             {
                 using var client = new SmtpClient();
                 await client.ConnectAsync(host, port, useSsl);
-                await client.AuthenticateAsync(senderUserName, senderPassword);
+                await client.AuthenticateAsync(senderUsername, senderPassword);
                 await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(true);
             }

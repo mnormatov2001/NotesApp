@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -43,7 +44,8 @@ namespace Notes.IdentityServer
                 config.Cookie.Name = "notesApp.Identity.cooke";
                 config.LoginPath = "/Auth/Login";
                 config.LogoutPath = "/Auth/Logout";
-                config.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                config.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                config.Cookie.HttpOnly = true;
             });
 
             builder.Services.AddControllersWithViews();
@@ -61,9 +63,17 @@ namespace Notes.IdentityServer
                     Path.Combine(app.Environment.ContentRootPath, "wwwroot"))
             });
 
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                Secure = CookieSecurePolicy.Always, 
+                HttpOnly = HttpOnlyPolicy.Always
+            });
+
             app.UseRouting();
             app.UseIdentityServer();
-            // app.UseHttpsRedirection();
+
+            if (app.Environment.IsProduction())
+                app.UseHttpsRedirection();
 
             app.MapDefaultControllerRoute();
 

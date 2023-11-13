@@ -42,10 +42,11 @@ namespace Notes.WebApi
             })
                 .AddJwtBearer("Bearer", options =>
                 {
-                    var cfg = builder.Configuration.GetSection("Authentication");
-                    options.Authority = cfg.GetSection("Authority").Value;
-                    options.Audience = cfg.GetSection("Audience").Value;
-                    options.RequireHttpsMetadata = cfg.GetSection("RequireHttpsMetadata").Get<bool>();
+                    options.Authority = builder.Configuration["Authentication:Authority"];
+                    options.Audience = builder.Configuration["Authentication:Audience"];
+                    options.MetadataAddress = builder.Configuration["Authentication:MetadataAddress"]!;
+                    options.RequireHttpsMetadata = builder.Configuration.GetSection("Authentication")
+                        .GetValue<bool>("RequireHttpsMetadata");
                 });
 
             builder.Services.AddSwaggerGen(options =>
@@ -91,12 +92,14 @@ namespace Notes.WebApi
             });
 
             app.UseCustomExceptionHandler();
+            
+            if (app.Environment.IsProduction()) 
+                app.UseHttpsRedirection();
+            
             app.UseRouting();
-            app.UseHttpsRedirection();
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
-            
             app.MapControllers();
 
             using (var scope = app.Services.CreateScope())
@@ -109,7 +112,8 @@ namespace Notes.WebApi
                 }
                 catch (Exception e)
                 {
-                    throw;
+                    var logger = provider.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(e, "An error occurred while app initialization");
                 }
             }
 

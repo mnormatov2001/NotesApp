@@ -6,10 +6,10 @@ namespace Notes.IdentityServer
     {
         public IdentityServerConfiguration(IConfiguration configuration)
         {
-            var section = configuration.GetSection("IdentityServerConfiguration");
-            ApiScopes = section.GetSection("ApiScopes").Get<ApiScope[]>();
-            ApiResources = section.GetSection("ApiResources").Get<ApiResource[]>();
-            Clients = section.GetSection("Clients").Get<Client[]>();
+            var section = configuration.GetRequiredSection("IdentityServerConfiguration");
+            ApiScopes = section.GetRequiredSection("ApiScopes").Get<ApiScope[]>();
+            ApiResources = section.GetRequiredSection("ApiResources").Get<ApiResource[]>();
+            Clients = section.GetRequiredSection("Clients").Get<Client[]>();
         }
         public IEnumerable<ApiScope> ApiScopes { get; }
         public IEnumerable<ApiResource> ApiResources { get; }
