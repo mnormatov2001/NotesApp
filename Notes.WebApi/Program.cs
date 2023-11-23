@@ -47,6 +47,9 @@ namespace Notes.WebApi
                     options.MetadataAddress = builder.Configuration["Authentication:MetadataAddress"]!;
                     options.RequireHttpsMetadata = builder.Configuration.GetSection("Authentication")
                         .GetValue<bool>("RequireHttpsMetadata");
+                    options.TokenValidationParameters.ValidIssuers = builder.Configuration
+                        .GetSection("Authentication:TokenValidationParameters:ValidIssuers")
+                        .Get<string[]>();
                 });
 
             builder.Services.AddSwaggerGen(options =>

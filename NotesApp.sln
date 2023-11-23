@@ -21,6 +21,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IdentityServer", "IdentityS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.IdentityServer", "Notes.IdentityServer\Notes.IdentityServer.csproj", "{FFA5EC75-9ADB-46D5-AE33-F5994E1E4B52}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{1B2CC6A9-8AA9-49F4-90CD-64158F1F5582}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{EDDED1A2-C6D9-43C6-BEF6-39C6931237DE}"
+	ProjectSection(SolutionItems) = preProject
+		docker\docker-compose.yml = docker\docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +64,7 @@ Global
 		{71D7B5FE-D24F-4764-B7F6-536B4008AEE0} = {3823C1B6-017B-4D41-AE16-6B49C42D5ECF}
 		{1BD7030A-05EE-441D-959A-BCFB610D589F} = {A8963F56-6C9B-4263-8403-CB03ECBE3DBC}
 		{FFA5EC75-9ADB-46D5-AE33-F5994E1E4B52} = {FC516CB4-1C74-4F45-A5BB-7822230F92D3}
+		{EDDED1A2-C6D9-43C6-BEF6-39C6931237DE} = {1B2CC6A9-8AA9-49F4-90CD-64158F1F5582}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75534A39-B6B6-4026-BC13-B26EECA07C8F}
