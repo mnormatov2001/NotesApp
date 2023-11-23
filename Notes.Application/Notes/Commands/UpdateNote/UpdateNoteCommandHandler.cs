@@ -24,7 +24,7 @@ namespace Notes.Application.Notes.Commands.UpdateNote
 
             note.Title = request.NoteTitle;
             note.Content = request.NoteContent;
-            note.EditDate = DateTime.Now;
+            note.EditDate = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 

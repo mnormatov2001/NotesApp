@@ -20,7 +20,7 @@ namespace Notes.Application.Notes.Commands.CreateNote
                 Id = Guid.NewGuid(),
                 Title = request.NoteTitle,
                 Content = request.NoteContent,
-                CreationDate = DateTime.Now
+                CreationDate = DateTime.UtcNow
             };
             note.EditDate = note.CreationDate;
 
