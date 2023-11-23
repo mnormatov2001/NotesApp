@@ -12,7 +12,7 @@ namespace Notes.Data.Extensions
         {
             var connectionString = configuration.GetConnectionString("DbConnection");
             services.AddDbContext<NotesDbContext>(options =>
-                options.UseSqlite(connectionString));
+                options.UseNpgsql(connectionString));
             services.AddScoped<INotesDbContext>(provider =>
                 provider.GetRequiredService<NotesDbContext>());
             return services;

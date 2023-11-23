@@ -17,7 +17,7 @@ namespace Notes.IdentityServer
 
             var connectionString = builder.Configuration.GetConnectionString("DbConnection");
             builder.Services.AddDbContext<AuthDbContext>(options =>
-                options.UseSqlite(connectionString));
+                options.UseNpgsql(connectionString));
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(config =>
             {
