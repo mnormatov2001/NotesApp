@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  postgresql:
+    image: 'bitnami/postgresql:latest'
+    container_name: 'postgresql'
+    hostname: postgresql
+    environment:
+      - POSTGRESQL_PASSWORD=notes-app-PASS
+      - POSTGRESQL_USERNAME=notes-app
+    networks:
+      - notes-app
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+
+
+  identity-server:
+    image: 'mnormatov2001/notes-identity-server-dev:latest'
+    container_name: 'server'
+    hostname: auth.notes.com
+    restart: unless-stopped
+    depends_on: 
+      - postgresql
+    ports:
+      - '7291:7291'
+    networks:
+      - notes-app
+
+  notes-api:
+    image: 'mnormatov2001/notes-api-dev:latest'
+    container_name: 'api'
+    hostname: api.notes.com
+    restart: unless-stopped
+    depends_on: 
+      - postgresql
+    ports:
+      - '7090:7090'
+    networks:
+      - notes-app
+
+volumes:
+  postgresql_data:
+
+networks:
+  notes-app:
+    driver: bridge
