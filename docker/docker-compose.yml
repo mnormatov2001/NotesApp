@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 services:
   postgresql:
@@ -16,7 +16,7 @@ services:
 
   identity-server:
     image: 'mnormatov2001/notes-identity-server-dev:latest'
-    container_name: 'server'
+    container_name: 'auth'
     hostname: auth.notes.com
     restart: unless-stopped
     depends_on: 
