@@ -2,9 +2,9 @@ name: Publish
 
 on:
   push:
-    branches: [ "CICD" ]
+    branches: [ "dev" ]
   pull_request:
-    branches: [ "CICD" ]
+    branches: [ "dev" ]
 
 jobs:
 
