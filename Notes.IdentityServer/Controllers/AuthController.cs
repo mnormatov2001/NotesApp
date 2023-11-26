@@ -28,7 +28,7 @@ namespace Notes.IdentityServer.Controllers
         [HttpGet]
         public IActionResult Login([Url] string returnUrl)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
                 return BadRequest(ModelState);
 
             var loginVm = new LoginViewModel { ReturnUrl = returnUrl };
@@ -71,7 +71,7 @@ namespace Notes.IdentityServer.Controllers
         [HttpGet]
         public IActionResult Register([Url] string returnUrl)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
                 return BadRequest(ModelState);
 
             var model = new RegisterViewModel { ReturnUrl = returnUrl };
