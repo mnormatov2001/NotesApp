@@ -133,9 +133,23 @@ namespace Notes.IdentityServer.Controllers
         {
             await _signInManager.SignOutAsync();
             var logoutRequest = await _interactionService.GetLogoutContextAsync(logoutId);
-            if (logoutRequest != null)
+
+            if (logoutRequest?.SignOutIFrameUrl != null &&
+                logoutRequest.PostLogoutRedirectUri != null)
+            {
+                var url = string.Format("{0}?logout-callbackUrl={1}",
+                    logoutRequest.PostLogoutRedirectUri,
+                    logoutRequest.SignOutIFrameUrl);
+                return Redirect(url);
+            }
+
+            if (logoutRequest?.PostLogoutRedirectUri != null)
                 return Redirect(logoutRequest.PostLogoutRedirectUri);
-            return RedirectToAction("Login", "Auth");
+
+            if (logoutRequest?.SignOutIFrameUrl != null)
+                return Redirect(logoutRequest.SignOutIFrameUrl);
+
+            return Ok("Выход выполнен успешно.");
         }
 
         [HttpGet]
