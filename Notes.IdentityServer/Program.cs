@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.OpenApi.Models;
 using Notes.IdentityServer.Data;
 using Notes.IdentityServer.Models;
 using Notes.IdentityServer.Services;
 using Notes.IdentityServer.Services.Interfaces;
+using System.Reflection;
 
 namespace Notes.IdentityServer
 {
@@ -52,10 +54,47 @@ namespace Notes.IdentityServer
 
             builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
 
+            builder.Services.AddSwaggerGen(options =>
+            {
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
+                options.AddSecurityDefinition("AuthToken",
+                    new OpenApiSecurityScheme
+                    {
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "Bearer",
+                        Name = "Authorization",
+                        Description = "Authorization token"
+                    });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "AuthToken"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
                 app.UseDeveloperExceptionPage();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(config =>
+            {
+                config.RoutePrefix = string.Empty;
+                config.SwaggerEndpoint("swagger/v1/swagger.json", "notes.app-IdentityServer");
+            });
 
             app.UseStaticFiles(new StaticFileOptions
             {

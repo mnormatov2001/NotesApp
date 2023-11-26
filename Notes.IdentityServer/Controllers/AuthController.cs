@@ -7,6 +7,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Notes.IdentityServer.Controllers
 {
+    [ApiController]
+    [Produces("Application/json")]
+    [Route("[controller]/[action]")]
     public class AuthController : Controller
     {
         private readonly SignInManager<AppUser> _signInManager;
