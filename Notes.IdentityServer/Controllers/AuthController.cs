@@ -340,5 +340,67 @@ namespace Notes.IdentityServer.Controllers
 
             return await _emailSender.SendEmailAsync(user.Email, subject, message);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> UserInfo()
+        {
+            if (User.Identity?.IsAuthenticated != true) 
+                return Unauthorized();
+
+            var email = User.FindFirst("email")?.Value;
+            var user = await _userManager.FindByEmailAsync(email);
+            var userInfo = new UserInfoViewModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                EmailConfirmed = user.EmailConfirmed
+            };
+            return Ok(userInfo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (User.Identity?.IsAuthenticated != true)
+                return Unauthorized();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var email = User.FindFirst("email")?.Value;
+            var user = await _userManager.FindByEmailAsync(email);
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (result.Succeeded)
+                return Ok("Новый пароль установлен.");
+
+            foreach (var error in result.Errors) 
+                ModelState.AddModelError(error.Code, error.Description);
+
+            return Conflict(ModelState);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>ChangeSubjectName(SubjectNameViewModel model)
+        {
+            if (User.Identity?.IsAuthenticated != true)
+                return Unauthorized();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var email = User.FindFirst("email")?.Value;
+            var user = await _userManager.FindByEmailAsync(email);
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+                return Ok("Имя и фамилия сохранены.");
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(error.Code, error.Description);
+
+            return Conflict(ModelState);
+        }
     }
 }
