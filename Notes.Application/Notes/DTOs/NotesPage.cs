@@ -2,6 +2,7 @@
 {
     public class NotesPage
     {
+        #nullable disable
         public IList<NoteVm> Notes { get; set; }
         public int PageIndex { get; set; }
         public int PageSize { get; set; }

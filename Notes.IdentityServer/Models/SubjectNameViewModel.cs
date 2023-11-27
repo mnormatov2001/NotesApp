@@ -4,6 +4,7 @@ namespace Notes.IdentityServer.Models
 {
     public class SubjectNameViewModel
     {
+        #nullable disable
         [Required]
         public string FirstName { get; set;}
         [Required]

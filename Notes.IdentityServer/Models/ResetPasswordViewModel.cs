@@ -1,10 +1,10 @@
-﻿using IdentityServer4.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Notes.IdentityServer.Models
 {
     public class ResetPasswordViewModel
     {
+        #nullable disable
         [Required(ErrorMessage = "*Это поле является обязательным.")]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]

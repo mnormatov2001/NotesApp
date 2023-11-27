@@ -2,6 +2,7 @@
 {
     public class Note
     {
+        #nullable disable
         public Guid UserId { get; set; }
         public Guid Id { get; set; }
         public string Title { get; set; }

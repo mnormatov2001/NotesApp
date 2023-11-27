@@ -4,6 +4,7 @@ namespace Notes.IdentityServer.Models
 {
     public class LoginViewModel
     {
+        #nullable disable
         [Required(ErrorMessage = "*Это поле является обязательным.")]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]

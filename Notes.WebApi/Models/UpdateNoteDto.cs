@@ -7,6 +7,7 @@ namespace Notes.WebApi.Models
 {
     public class UpdateNoteDto : IMapWith<UpdateNoteCommand>
     {
+        #nullable disable
         [Required]
         public Guid NoteId { get; set; }
         [Required]

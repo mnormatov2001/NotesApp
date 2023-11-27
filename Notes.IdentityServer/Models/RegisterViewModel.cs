@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Notes.IdentityServer.Models
 {
     public class RegisterViewModel
     {
+        #nullable disable
         [Required(ErrorMessage = "*Это поле является обязательным.")]
         [StringLength(20, ErrorMessage = "*Длина имени должна быть между {2} и {1}.", MinimumLength = 2)]
         public string FirstName { get; set; }

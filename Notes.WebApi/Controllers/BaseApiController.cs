@@ -8,12 +8,13 @@ namespace Notes.WebApi.Controllers
     [Route("notes.app/[controller]/[action]")]
     public abstract class BaseApiController : ControllerBase
     {
+        #nullable disable
         private IMediator _mediator;
         protected IMediator Mediator => 
             _mediator ??= HttpContext.RequestServices.GetRequiredService<IMediator>();
 
-        internal Guid UserId => !User.Identity.IsAuthenticated
-            ? Guid.Empty
-            : Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        internal Guid UserId => User.Identity is { IsAuthenticated: true }
+            ? Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
+            : Guid.Empty;
     }
 }

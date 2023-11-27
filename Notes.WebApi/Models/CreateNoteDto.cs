@@ -7,6 +7,7 @@ namespace Notes.WebApi.Models
 {
     public class CreateNoteDto : IMapWith<CreateNoteCommand>
     {
+        #nullable disable
         [Required]
         public string NoteTitle { get; set; }
         [Required]

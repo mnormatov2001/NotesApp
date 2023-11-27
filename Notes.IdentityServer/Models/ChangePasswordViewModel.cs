@@ -4,6 +4,7 @@ namespace Notes.IdentityServer.Models
 {
     public class ChangePasswordViewModel
     {
+        #nullable disable
         [Required]
         public string CurrentPassword { get; set; }
         [Required]
@@ -14,6 +15,6 @@ namespace Notes.IdentityServer.Models
         [Required]
         [DataType(DataType.Password)]
         [Compare(nameof(NewPassword))]
-        public string ConfirmPassword { get; set; }
+        public string ConfirmNewPassword { get; set; }
     }
 }

@@ -6,6 +6,7 @@ namespace Notes.Application.Notes.DTOs
 {
     public class NoteVm : IMapWith<Note>
     {
+        #nullable disable
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
