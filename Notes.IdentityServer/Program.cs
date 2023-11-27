@@ -53,6 +53,7 @@ namespace Notes.IdentityServer
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
+            builder.Services.AddSingleton<EmailService>();
 
             builder.Services.AddSwaggerGen(options =>
             {

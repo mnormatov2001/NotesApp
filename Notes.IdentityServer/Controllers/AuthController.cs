@@ -2,30 +2,27 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.IdentityServer.Models;
-using Notes.IdentityServer.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using Notes.IdentityServer.Services;
 
 namespace Notes.IdentityServer.Controllers
 {
-    [ApiController]
-    [Produces("Application/json")]
-    [Route("[controller]/[action]")]
     public class AuthController : Controller
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
         private readonly IIdentityServerInteractionService _interactionService;
-        private readonly IEmailSender _emailSender;
+        private readonly EmailService _emailService;
 
         public AuthController(SignInManager<AppUser> signInManager, 
             UserManager<AppUser> userManager, 
-            IIdentityServerInteractionService interactionService, 
-            IEmailSender emailSender)
+            IIdentityServerInteractionService interactionService,
+            EmailService emailService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _interactionService = interactionService;
-            _emailSender = emailSender;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -35,7 +32,8 @@ namespace Notes.IdentityServer.Controllers
                 return BadRequest(ModelState);
 
             var loginVm = new LoginViewModel { ReturnUrl = returnUrl };
-            var passwordResetQueryVm = new PasswordResetQueryViewModel { ReturnUrl = returnUrl };
+            var passwordResetQueryVm = 
+                new PasswordResetQueryViewModel { ReturnUrl = returnUrl };
             return View((loginVm, passwordResetQueryVm));
         }
 
@@ -125,23 +123,20 @@ namespace Notes.IdentityServer.Controllers
             var confirmationToken = 
                 await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var callbackUrl = Url.Action("ConfirmEmail", "Auth",
+            var callbackUrl = Url.Action("ConfirmEmail", "Account",
                 new { email = user.Email, confirmationToken = confirmationToken },
-                Request.Scheme);
+                Request.Scheme)!;
 
-            var subject = "Подтверждение аккаунта NotesApp";
-            var message = "Добро пожаловать в NotesApp!\n" +
-                          "Подтвердите регистрацию, перейдя по ссылке: " +
-                          $"<a href=\"{callbackUrl}\">{callbackUrl}</a>";
-
-            return await _emailSender.SendEmailAsync(user.Email, subject, message);
+            return await _emailService.SendAccountConfirmationEmailAsync(
+                user.Email, callbackUrl);
         }
 
         [HttpGet]
         public async Task<IActionResult> Logout(string logoutId)
         {
             await _signInManager.SignOutAsync();
-            var logoutRequest = await _interactionService.GetLogoutContextAsync(logoutId);
+            var logoutRequest = await _interactionService.
+                GetLogoutContextAsync(logoutId);
 
             if (logoutRequest?.SignOutIFrameUrl != null &&
                 logoutRequest.PostLogoutRedirectUri != null)
@@ -161,63 +156,7 @@ namespace Notes.IdentityServer.Controllers
             return Ok("Выход выполнен успешно.");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> RequestConfirmationEmail(
-            [EmailAddress] string email)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return BadRequest($"\"{email}\" не зарегистрирован.");
-
-            if (user.EmailConfirmed)
-                return Ok($"Почта \"{email}\" уже подтверждена.");
-
-            var success = await SendConfirmationEmail(user);
-            if (!success)
-                return Problem("Внутренняя ошибка сервера - " +
-                               "не удалось отправить письмо подтверждения.");
-
-            return Ok($"Письмо подтверждения отправлено на \"{email}\" .");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(
-            [EmailAddress] string email, 
-            [Required] string confirmationToken)
-        {
-            if (!ModelState.IsValid)
-            {
-                ModelState.AddModelError(string.Empty,
-                    "Неверная ссылка подтверждения.");
-                return BadRequest(ModelState);
-            }
-
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                ModelState.AddModelError(string.Empty,
-                    "Неверная ссылка подтверждения.");
-                return BadRequest(ModelState);
-            }
-
-            if (user.EmailConfirmed)
-                return Ok($"Почта \"{email}\" уже подтверждена!");
-
-            var result = await _userManager.ConfirmEmailAsync(user, confirmationToken);
-            if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors) 
-                    ModelState.AddModelError(error.Code, error.Description);
-                
-                ModelState.AddModelError(string.Empty, 
-                    "Не удалось подтвердить почту.");
-                return BadRequest(ModelState);
-            }
-            return Ok($"Почта \"{email}\" успешно подтверждена!");
-        }
+        
 
         [HttpPost]
         public async Task<IActionResult> RequestPasswordResetEmail(
@@ -267,7 +206,7 @@ namespace Notes.IdentityServer.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(string.Empty,
+                ModelState.AddModelError("Ошибка",
                     "Неверная ссылка для сброса пароля.");
                 return BadRequest(ModelState);
             }
@@ -275,7 +214,7 @@ namespace Notes.IdentityServer.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty,
+                ModelState.AddModelError("Ошибка",
                     "Неверная ссылка для сброса пароля.");
                 return BadRequest(ModelState);
             }
@@ -285,7 +224,7 @@ namespace Notes.IdentityServer.Controllers
                 UserManager<AppUser>.ResetPasswordTokenPurpose, passwordResetToken);
             if (!okay)
             {
-                ModelState.AddModelError(string.Empty,
+                ModelState.AddModelError("Ошибка",
                     "Неверная ссылка для сброса пароля.");
                 return BadRequest(ModelState);
             }
@@ -308,7 +247,7 @@ namespace Notes.IdentityServer.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty,
+                ModelState.AddModelError("Ошибка",
                     "Неверная ссылка для сброса пароля.");
                 return BadRequest(ModelState);
             }
@@ -320,7 +259,7 @@ namespace Notes.IdentityServer.Controllers
                 foreach (var error in result.Errors) 
                     ModelState.AddModelError(error.Code, error.Description);
                 
-                ModelState.AddModelError(string.Empty,
+                ModelState.AddModelError("Ошибка",
                     "Неверная ссылка для сброса пароля.");
                 return BadRequest(ModelState);
             }
@@ -334,76 +273,9 @@ namespace Notes.IdentityServer.Controllers
 
             var callbackUrl = Url.Action("ResetPassword", "Auth",
                 new { email = user.Email, passwordResetToken = token },
-                Request.Scheme);
+                Request.Scheme)!;
 
-            var subject = "Сброс пароля аккаунта NotesApp";
-            var message = "С возвращением в NotesApp!\n" +
-                          "Для сброса пароля перейдите по ссылке: " +
-                          $"<a href=\"{callbackUrl}\">{callbackUrl}</a>";
-
-            return await _emailSender.SendEmailAsync(user.Email, subject, message);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> UserInfo()
-        {
-            if (User.Identity?.IsAuthenticated != true) 
-                return Unauthorized();
-
-            var email = User.FindFirst("email")?.Value;
-            var user = await _userManager.FindByEmailAsync(email);
-            var userInfo = new UserInfoViewModel
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                EmailConfirmed = user.EmailConfirmed
-            };
-            return Ok(userInfo);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (User.Identity?.IsAuthenticated != true)
-                return Unauthorized();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var email = User.FindFirst("email")?.Value;
-            var user = await _userManager.FindByEmailAsync(email);
-            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-            if (result.Succeeded)
-                return Ok("Новый пароль установлен.");
-
-            foreach (var error in result.Errors) 
-                ModelState.AddModelError(error.Code, error.Description);
-
-            return Conflict(ModelState);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult>ChangeSubjectName(SubjectNameViewModel model)
-        {
-            if (User.Identity?.IsAuthenticated != true)
-                return Unauthorized();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var email = User.FindFirst("email")?.Value;
-            var user = await _userManager.FindByEmailAsync(email);
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
-                return Ok("Имя и фамилия сохранены.");
-
-            foreach (var error in result.Errors)
-                ModelState.AddModelError(error.Code, error.Description);
-
-            return Conflict(ModelState);
+            return await _emailService.SendPasswordResetEmailAsync(user.Email, callbackUrl);
         }
     }
 }
