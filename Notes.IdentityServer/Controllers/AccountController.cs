@@ -21,6 +21,22 @@ namespace Notes.IdentityServer.Controllers
             _emailService = emailService;
         }
 
+        /// <summary>
+        /// Requests account confirmation email for specified email address.
+        /// </summary>
+        /// <param name="email">Email address</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthenticated</response>
+        /// <response code="400">If the request is not validated or the specified email address is not registered</response>
+        /// <response code="409">If the specified email address is already confirmed</response>
+        /// <response code="500">If there was an error when sending email</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(object))]
         [HttpGet]
         public async Task<IActionResult> RequestConfirmationEmail(
             [EmailAddress] string email)
@@ -59,21 +75,31 @@ namespace Notes.IdentityServer.Controllers
             return await _emailService.SendAccountConfirmationEmailAsync(user.Email, callbackUrl);
         }
 
+        /// <summary>
+        /// Confirms email for user's account.
+        /// <para>
+        /// This endpoint will be called when the confirmation link is followed.
+        /// </para>
+        /// </summary>
+        /// <param name="email">Email address</param>
+        /// <param name="confirmationToken"> Confirmation token</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">If the request is not validated or the link is invalid</response>
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(object))]
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(
             [EmailAddress] string email,
             [Required] string confirmationToken)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(new { error = "Неверная ссылка подтверждения." });
-            }
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-            {
                 return BadRequest(new { error = "Неверная ссылка подтверждения." });
-            }
 
             if (user.EmailConfirmed)
                 return Ok($"Почта '{email}' уже подтверждена!");
@@ -91,6 +117,15 @@ namespace Notes.IdentityServer.Controllers
             return Ok($"Почта '{email}' успешно подтверждена!");
         }
 
+        /// <summary>
+        /// Retrieves user information.
+        /// </summary>
+        /// <returns>Returns UserInfoViewModel</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthenticated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(UserInfoViewModel), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(object))]
         [HttpGet]
         public async Task<IActionResult> UserInfo()
         {
@@ -109,6 +144,20 @@ namespace Notes.IdentityServer.Controllers
             return Ok(userInfo);
         }
 
+        /// <summary>
+        /// changes password for the user account.
+        /// </summary>
+        /// <param name="model">ChangePasswordViewModel</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">If the request is not validated</response>
+        /// <response code="401">If the user is unauthenticated</response>
+        /// <response code="409">If unable to change password</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(object))]
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
@@ -130,6 +179,20 @@ namespace Notes.IdentityServer.Controllers
             return Conflict(ModelState);
         }
 
+        /// <summary>
+        /// Changes user's first and last name.
+        /// </summary>
+        /// <param name="model">SubjectNameViewModel</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">If the request is not validated</response>
+        /// <response code="401">If the user is unauthenticated</response>
+        /// <response code="409">If unable to change user's first and last name</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(object))]
         [HttpPost]
         public async Task<IActionResult> ChangeSubjectName(SubjectNameViewModel model)
         {
