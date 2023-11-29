@@ -34,18 +34,14 @@ namespace Notes.IdentityServer.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(object))]
         [HttpGet]
         public async Task<IActionResult> RequestConfirmationEmail(
             [EmailAddress] string email)
         {
             if (User.Identity?.IsAuthenticated != true)
                 return Unauthorized();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -88,15 +84,11 @@ namespace Notes.IdentityServer.Controllers
         /// <response code="400">If the request is not validated or the link is invalid</response>
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(object))]
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(
             [EmailAddress] string email,
             [Required] string confirmationToken)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { error = "Неверная ссылка подтверждения." });
-
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
                 return BadRequest(new { error = "Неверная ссылка подтверждения." });
@@ -125,7 +117,6 @@ namespace Notes.IdentityServer.Controllers
         /// <response code="401">If the user is unauthenticated</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(UserInfoViewModel), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(object))]
         [HttpGet]
         public async Task<IActionResult> UserInfo()
         {
@@ -157,15 +148,11 @@ namespace Notes.IdentityServer.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(object))]
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (User.Identity?.IsAuthenticated != true)
                 return Unauthorized();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var email = User.FindFirst("email")?.Value;
             var user = await _userManager.FindByEmailAsync(email);
@@ -192,15 +179,11 @@ namespace Notes.IdentityServer.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(object))]
         [HttpPost]
         public async Task<IActionResult> ChangeSubjectName(SubjectNameViewModel model)
         {
             if (User.Identity?.IsAuthenticated != true)
                 return Unauthorized();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var email = User.FindFirst("email")?.Value;
             var user = await _userManager.FindByEmailAsync(email);
