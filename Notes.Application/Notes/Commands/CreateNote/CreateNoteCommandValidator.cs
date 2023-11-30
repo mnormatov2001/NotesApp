@@ -7,6 +7,7 @@ namespace Notes.Application.Notes.Commands.CreateNote
         public CreateNoteCommandValidator()
         {
             RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
+            RuleFor(cmd => cmd.GroupId).NotEqual(Guid.Empty);
             RuleFor(cmd => cmd.NoteTitle).Must(str => !string.IsNullOrWhiteSpace(str)).MaximumLength(250);
             RuleFor(cmd => cmd.NoteContent).Must(str => !string.IsNullOrWhiteSpace(str));
         }

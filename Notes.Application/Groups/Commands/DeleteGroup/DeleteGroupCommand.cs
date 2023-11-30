@@ -1,8 +1,8 @@
 ﻿using MediatR;
 
-namespace Notes.Application.Notes.Queries.GetNotesCount
+namespace Notes.Application.Groups.Commands.DeleteGroup
 {
-    public class GetNotesCountQuery : IRequest<int>
+    public class DeleteGroupCommand : IRequest<Guid>
     {
         public Guid UserId { get; set; }
         public Guid GroupId { get; set; }

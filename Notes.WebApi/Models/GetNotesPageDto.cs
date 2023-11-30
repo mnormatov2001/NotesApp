@@ -9,6 +9,7 @@ namespace Notes.WebApi.Models
 {
     public class GetNotesPageDto : IMapWith<GetNotesPageQuery>
     {
+        public Guid GroupId { get; set; }
         public int PageSize { get; set; }
         public int PageIndex { get; set; }
 
@@ -34,6 +35,8 @@ namespace Notes.WebApi.Models
         public void Mapping(Profile profile)
         {
             profile.CreateMap<GetNotesPageDto, GetNotesPageQuery>()
+                .ForMember(query => query.GroupId,
+                    opt => opt.MapFrom(dto => dto.GroupId))
                 .ForMember(query => query.PageIndex,
                     opt => opt.MapFrom(dto => dto.PageIndex))
                 .ForMember(query => query.PageSize,
