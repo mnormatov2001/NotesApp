@@ -13,7 +13,7 @@ using Notes.WebApi.Models;
 namespace Notes.WebApi.Controllers
 {
     [Produces("Application/json")]
-    [Route("notes.app/[controller]")]
+    [Route("[controller]")]
     public class NotesController : BaseApiController
     {
         private readonly IMapper _mapper;
