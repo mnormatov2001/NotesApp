@@ -6,6 +6,7 @@ namespace Notes.Application.Notes.Commands.CreateNote
     {
         #nullable disable
         public Guid UserId { get; set; }
+        public Guid GroupId { get; set; }
         public string NoteTitle { get; set; }
         public string NoteContent { get; set; }
     }

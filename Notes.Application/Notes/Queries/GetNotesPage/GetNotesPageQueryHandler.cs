@@ -18,9 +18,12 @@ namespace Notes.Application.Notes.Queries.GetNotesPage
             _mapper = mapper;
         }
 
-        public async Task<NotesPage> Handle(GetNotesPageQuery request, CancellationToken cancellationToken)
+        public async Task<NotesPage> Handle(GetNotesPageQuery request, 
+            CancellationToken cancellationToken)
         {
-            var query = _dbContext.Notes.Where(note => note.UserId == request.UserId);
+            var query = _dbContext.Notes.Where(note => 
+                note.UserId == request.UserId && 
+                note.GroupId == request.GroupId);
 
             query = request.SortKey switch
             {

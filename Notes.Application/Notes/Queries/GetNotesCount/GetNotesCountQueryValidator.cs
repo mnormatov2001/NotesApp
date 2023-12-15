@@ -6,7 +6,8 @@ namespace Notes.Application.Notes.Queries.GetNotesCount
     {
         public GetNotesCountQueryValidator()
         {
-            RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
+            RuleFor(query => query.UserId).NotEqual(Guid.Empty);
+            RuleFor(query => query.GroupId).NotEqual(Guid.Empty);
         }
     }
 }
