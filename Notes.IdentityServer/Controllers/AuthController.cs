@@ -141,7 +141,7 @@ namespace Notes.IdentityServer.Controllers
             if (logoutRequest?.SignOutIFrameUrl != null &&
                 logoutRequest.PostLogoutRedirectUri != null)
             {
-                var url = string.Format("{0}?logout-callbackUrl={1}",
+                var url = string.Format("{0}?callbackUrl={1}",
                     logoutRequest.PostLogoutRedirectUri,
                     logoutRequest.SignOutIFrameUrl);
                 return Redirect(url);
