@@ -8,7 +8,6 @@ namespace Notes.WebApi.Models
     public class CreateNoteDto : IMapWith<CreateNoteCommand>
     {
         #nullable disable
-        public Guid GroupId { get; set; }
         [Required]
         public string NoteTitle { get; set; }
         [Required]
@@ -17,8 +16,6 @@ namespace Notes.WebApi.Models
         public void Mapping(Profile profile)
         {
             profile.CreateMap<CreateNoteDto, CreateNoteCommand>()
-                .ForMember(cmd => cmd.GroupId,
-                    opt => opt.MapFrom(dto => dto.GroupId))
                 .ForMember(cmd => cmd.NoteTitle,
                     opt => opt.MapFrom(dto => dto.NoteTitle))
                 .ForMember(cmd => cmd.NoteContent,

@@ -6,7 +6,6 @@ namespace Notes.Application.Notes.Queries.GetNotesPage
     public class GetNotesPageQuery : IRequest<NotesPage>
     {
         public Guid UserId { get; set; }
-        public Guid GroupId { get; set; }
         public int PageSize { get; set; }
         public int PageIndex { get; set; }
         public SortKey SortKey { get; set; }

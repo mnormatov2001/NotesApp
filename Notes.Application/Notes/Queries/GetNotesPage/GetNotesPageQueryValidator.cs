@@ -7,7 +7,6 @@ namespace Notes.Application.Notes.Queries.GetNotesPage
         public GetNotesPageQueryValidator()
         {
             RuleFor(query => query.UserId).NotEqual(Guid.Empty);
-            RuleFor(query => query.GroupId).NotEqual(Guid.Empty);
             RuleFor(query => query.PageIndex).GreaterThanOrEqualTo(0);
             RuleFor(query => query.PageSize).GreaterThanOrEqualTo(1);
         }

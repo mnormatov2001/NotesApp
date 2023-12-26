@@ -10,13 +10,7 @@ namespace Notes.Data.EntityTypeConfigurations
         {
             builder.HasKey(note => note.Id);
             builder.HasIndex(note => note.Id).IsUnique();
-            builder.HasIndex(note => note.GroupId).IsUnique(false);
             builder.Property(note => note.Title).HasMaxLength(250);
-            builder.HasOne<Group>()
-                .WithMany(group => group.Notes)
-                .HasForeignKey(note => note.GroupId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -8,7 +8,6 @@ namespace Notes.Data
     public class NotesDbContext : DbContext, INotesDbContext
     {
         public DbSet<Note> Notes { get; set; }
-        public DbSet<Group> Groups { get; set; }
 
         public NotesDbContext(DbContextOptions<NotesDbContext> options) 
             : base(options) { }
@@ -16,7 +15,6 @@ namespace Notes.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfiguration(new NoteConfiguration());
-            builder.ApplyConfiguration(new GroupConfiguration());
             base.OnModelCreating(builder);
         }
     }
