@@ -132,8 +132,7 @@ namespace Notes.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("page")]
         [Authorize]
-        public async Task<ActionResult<NotesPage>> GetNotesPage(
-            [FromQuery] GetNotesPageDto getNotesPageDto)
+        public async Task<ActionResult<NotesPage>> GetNotesPage([FromQuery] GetNotesPageDto getNotesPageDto)
         {
             var query = _mapper.Map<GetNotesPageQuery>(getNotesPageDto);
             query.UserId = UserId;
@@ -151,15 +150,11 @@ namespace Notes.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpGet("count/{groupId:guid}")]
+        [HttpGet("count")]
         [Authorize]
-        public async Task<ActionResult<int>> GetNotesCount(Guid groupId)
+        public async Task<ActionResult<int>> GetNotesCount()
         {
-            var query = new GetNotesCountQuery
-            {
-                UserId = UserId, 
-                GroupId = groupId
-            };
+            var query = new GetNotesCountQuery { UserId = UserId };
             var notesCount = await Mediator.Send(query);
             return Ok(notesCount);
         }

@@ -15,8 +15,7 @@ namespace Notes.Application.Notes.Queries.GetNotesCount
             CancellationToken cancellationToken)
         {
             return await _dbContext.Notes.CountAsync(note => 
-                note.UserId == request.UserId && 
-                note.GroupId == request.GroupId, cancellationToken);
+                note.UserId == request.UserId, cancellationToken);
         }
     }
 }

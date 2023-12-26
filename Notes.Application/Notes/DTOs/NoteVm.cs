@@ -8,7 +8,6 @@ namespace Notes.Application.Notes.DTOs
     {
         #nullable disable
         public Guid Id { get; set; }
-        public Guid GroupId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public DateTime CreationDate { get; set; }
@@ -19,8 +18,6 @@ namespace Notes.Application.Notes.DTOs
             profile.CreateMap<Note, NoteVm>()
                 .ForMember(noteVm => noteVm.Id,
                     opt => opt.MapFrom(note => note.Id))
-                .ForMember(noteVm => noteVm.GroupId,
-                    opt => opt.MapFrom(note => note.GroupId))
                 .ForMember(noteVm => noteVm.Title,
                     opt => opt.MapFrom(note => note.Title))
                 .ForMember(noteVm => noteVm.Content,

@@ -5,7 +5,6 @@
         #nullable disable
         public Guid UserId { get; set; }
         public Guid Id { get; set; }
-        public Guid GroupId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public DateTime CreationDate { get; set; }
