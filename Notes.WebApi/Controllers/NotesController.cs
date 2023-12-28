@@ -5,15 +5,16 @@ using Notes.Application.Notes.Commands.CreateNote;
 using Notes.Application.Notes.Commands.DeleteNote;
 using Notes.Application.Notes.Commands.UpdateNote;
 using Notes.Application.Notes.DTOs;
+using Notes.Application.Notes.Queries.GetAllNotes;
 using Notes.Application.Notes.Queries.GetNote;
+using Notes.Application.Notes.Queries.GetNotes;
 using Notes.Application.Notes.Queries.GetNotesCount;
-using Notes.Application.Notes.Queries.GetNotesPage;
 using Notes.WebApi.Models;
 
 namespace Notes.WebApi.Controllers
 {
     [Produces("Application/json")]
-    [Route("[controller]")]
+    [Route("notes")]
     public class NotesController : BaseApiController
     {
         private readonly IMapper _mapper;
@@ -40,7 +41,7 @@ namespace Notes.WebApi.Controllers
         {
             var query = new GetNoteQuery
             {
-                NoteId = id,
+                Id = id,
                 UserId = UserId
             };
 
@@ -67,7 +68,7 @@ namespace Notes.WebApi.Controllers
         {
             var cmd = new DeleteNoteCommand
             {
-                NoteId = id,
+                Id = id,
                 UserId = UserId
             };
 
@@ -88,7 +89,7 @@ namespace Notes.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpPut]
+        [HttpPut("update")]
         [Authorize]
         public async Task<ActionResult<Guid>> UpdateNote([FromBody] UpdateNoteDto updateNoteDto)
         {
@@ -102,14 +103,14 @@ namespace Notes.WebApi.Controllers
         /// Creates the note
         /// </summary>
         /// <param name="createNoteDto">CreateNoteDto</param>
-        /// <returns>Returns created note id</returns>
+        /// <returns>Returns created note id (guid)</returns>
         /// <response code="200">Success</response>
         /// <response code="401">If the user is unauthorized</response>
         /// <response code="400">If the request is not validated</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpPost]
+        [HttpPost("create")]
         [Authorize]
         public async Task<ActionResult<Guid>> CreateNote([FromBody] CreateNoteDto createNoteDto)
         {
@@ -120,43 +121,73 @@ namespace Notes.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets notes page
+        /// Gets the number of child elements of a note
         /// </summary>
-        /// <param name="getNotesPageDto">GetNotesPageDto</param>
-        /// <returns>Returns notes page (NotesPage)</returns>
+        /// <param name="parentNoteId">Id of parent note (guid)</param>
+        /// <returns>Returns (int)</returns>
         /// <response code="200">Success</response>
         /// <response code="401">If the user is unauthorized</response>
         /// <response code="400">If the request is not validated</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpGet("page")]
+        [HttpGet("children/count")]
         [Authorize]
-        public async Task<ActionResult<NotesPage>> GetNotesPage([FromQuery] GetNotesPageDto getNotesPageDto)
+        public async Task<ActionResult<int>> GetChildNotesCount(Guid parentNoteId)
         {
-            var query = _mapper.Map<GetNotesPageQuery>(getNotesPageDto);
-            query.UserId = UserId;
-            var notesPage = await Mediator.Send(query);
-            return Ok(notesPage);
+            var query = new GetNotesCountQuery
+            {
+                UserId = UserId,
+                ParentNoteId = parentNoteId
+            };
+            var notesCount = await Mediator.Send(query);
+            return Ok(notesCount);
         }
 
         /// <summary>
-        /// Gets notes count
+        /// Gets all child elements of a note
         /// </summary>
-        /// <returns>Returns notes count (int)</returns>
+        /// <param name="parentNoteId">Id of parent note (guid)</param>
+        /// <returns>Returns (NoteVm[])</returns>
         /// <response code="200">Success</response>
         /// <response code="401">If the user is unauthorized</response>
         /// <response code="400">If the request is not validated</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpGet("count")]
+        [HttpGet("children")]
         [Authorize]
-        public async Task<ActionResult<int>> GetNotesCount()
+        public async Task<ActionResult<IEnumerable<NoteVm>>> GetChildrenNotes(Guid parentNoteId)
         {
-            var query = new GetNotesCountQuery { UserId = UserId };
-            var notesCount = await Mediator.Send(query);
-            return Ok(notesCount);
+            var query = new GetNotesQuery
+            {
+                UserId = UserId,
+                ParentNoteId = parentNoteId
+            };
+            var notes = await Mediator.Send(query);
+            return Ok(notes);
+        }
+
+        /// <summary>
+        /// Gets all notes
+        /// </summary>
+        /// <returns>Returns (NoteVm[])</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("all")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<NoteVm>>> GetAllNotes()
+        {
+            var query = new GetAllNotesQuery()
+            {
+                UserId = UserId,
+            };
+            var notes = await Mediator.Send(query);
+            return Ok(notes);
         }
     }
 }

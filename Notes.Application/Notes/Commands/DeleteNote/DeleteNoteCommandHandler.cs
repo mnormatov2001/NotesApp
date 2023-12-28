@@ -16,10 +16,10 @@ namespace Notes.Application.Notes.Commands.DeleteNote
         public async Task<Guid> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
         {
             var note = await _dbContext.Notes.FirstOrDefaultAsync(entity =>
-                entity.Id == request.NoteId, cancellationToken);
+                entity.Id == request.Id, cancellationToken);
 
             if (note == null || note.UserId != request.UserId)
-                throw new NotFoundException(nameof(Note), request.NoteId);
+                throw new NotFoundException(nameof(Note), request.Id);
 
             _dbContext.Notes.Remove(note);
             await _dbContext.SaveChangesAsync(cancellationToken);

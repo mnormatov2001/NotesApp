@@ -16,11 +16,16 @@ namespace Notes.Application.Notes.Commands.CreateNote
         {
             var note = new Note
             {
-                UserId = request.UserId,
                 Id = Guid.NewGuid(),
-                Title = request.NoteTitle,
-                Content = request.NoteContent,
-                CreationDate = DateTime.UtcNow
+                Icon = request.Icon,
+                Title = request.Title,
+                Content = request.Content,
+                UserId = request.UserId,
+                CoverImage = request.CoverImage,
+                IsArchived = request.IsArchived,
+                IsPublished = request.IsPublished,
+                ParentNoteId = request.ParentNoteId,
+                CreationDate = DateTime.UtcNow,
             };
             note.EditDate = note.CreationDate;
 

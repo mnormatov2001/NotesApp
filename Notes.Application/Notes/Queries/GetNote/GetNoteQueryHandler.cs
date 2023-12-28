@@ -22,10 +22,10 @@ namespace Notes.Application.Notes.Queries.GetNote
         public async Task<NoteVm> Handle(GetNoteQuery request, CancellationToken cancellationToken)
         {
             var note = await _dbContext.Notes.FirstOrDefaultAsync(entity =>
-                entity.Id == request.NoteId, cancellationToken);
+                entity.Id == request.Id, cancellationToken);
 
             if (note == null || note.UserId != request.UserId)
-                throw new NotFoundException(nameof(Note), request.NoteId);
+                throw new NotFoundException(nameof(Note), request.Id);
 
             return _mapper.Map<NoteVm>(note);
         }

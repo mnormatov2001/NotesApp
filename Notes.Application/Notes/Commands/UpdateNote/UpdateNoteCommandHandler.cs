@@ -17,14 +17,19 @@ namespace Notes.Application.Notes.Commands.UpdateNote
             CancellationToken cancellationToken)
         {
             var note = await _dbContext.Notes.FirstOrDefaultAsync(entity => 
-                entity.Id == request.NoteId, cancellationToken);
+                entity.Id == request.Id, cancellationToken);
 
             if (note == null || note.UserId != request.UserId)
-                throw new NotFoundException(nameof(Note), request.NoteId);
+                throw new NotFoundException(nameof(Note), request.Id);
 
-            note.Title = request.NoteTitle;
-            note.Content = request.NoteContent;
+            note.Icon = request.Icon;
+            note.Title = request.Title;
+            note.Content = request.Content;
             note.EditDate = DateTime.UtcNow;
+            note.CoverImage = request.CoverImage;
+            note.IsArchived = request.IsArchived;
+            note.IsPublished = request.IsPublished;
+            note.ParentNoteId = request.ParentNoteId;
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
