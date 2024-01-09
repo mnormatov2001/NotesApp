@@ -22,7 +22,7 @@ namespace Notes.Application.Notes.Queries.GetNotes
         {
             var notes = _dbContext.Notes
                 .Where(entity => entity.ParentNoteId == request.ParentNoteId &&
-                                 entity.UserId == request.UserId);
+                                 entity.UserId == request.UserId && !entity.IsArchived);
 
             return await _mapper.ProjectTo<NoteVm>(notes).ToListAsync(cancellationToken);
         }
