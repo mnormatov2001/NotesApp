@@ -11,6 +11,7 @@ using Notes.Application.Notes.Queries.GetAllNotes;
 using Notes.Application.Notes.Queries.GetNote;
 using Notes.Application.Notes.Queries.GetNotes;
 using Notes.Application.Notes.Queries.GetNotesCount;
+using Notes.Application.Notes.Queries.GetNotesTrash;
 using Notes.WebApi.Models;
 
 namespace Notes.WebApi.Controllers
@@ -239,6 +240,28 @@ namespace Notes.WebApi.Controllers
         public async Task<ActionResult<IEnumerable<NoteVm>>> GetAllNotes()
         {
             var query = new GetAllNotesQuery()
+            {
+                UserId = UserId,
+            };
+            var notes = await Mediator.Send(query);
+            return Ok(notes);
+        }
+
+        /// <summary>
+        /// Gets notes trash
+        /// </summary>
+        /// <returns>Returns (NoteVm[])</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("trash")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<NoteVm>>> GetNotesTrash()
+        {
+            var query = new GetNotesTrashQuery
             {
                 UserId = UserId,
             };
