@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Notes.Application.Notes.Commands.ArchiveNote;
 using Notes.Application.Notes.Commands.CreateNote;
 using Notes.Application.Notes.Commands.DeleteNote;
+using Notes.Application.Notes.Commands.RestoreNote;
 using Notes.Application.Notes.Commands.UpdateNote;
 using Notes.Application.Notes.DTOs;
 using Notes.Application.Notes.Queries.GetAllNotes;
@@ -95,6 +96,33 @@ namespace Notes.WebApi.Controllers
         public async Task<ActionResult<Guid>> ArchiveNote(Guid id)
         {
             var cmd = new ArchiveNoteCommand
+            {
+                Id = id,
+                UserId = UserId
+            };
+
+            var result = await Mediator.Send(cmd);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Restores the note
+        /// </summary>
+        /// <param name="id">Note id (guid)</param>
+        /// <returns>Returns restored note id (guid)</returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        /// <response code="404">If the requested note is not found</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPut("restore")]
+        [Authorize]
+        public async Task<ActionResult<Guid>> RestoreNote(Guid id)
+        {
+            var cmd = new RestoreNoteCommand
             {
                 Id = id,
                 UserId = UserId
