@@ -25,6 +25,15 @@ namespace Notes.Application.Notes.Commands.RestoreNote
                 return note.Id;
 
             note.IsArchived = false;
+            if (note.ParentNoteId != Guid.Empty)
+            {
+                var parent =
+                    await _dbContext.Notes.FirstOrDefaultAsync(entity => entity.Id == note.ParentNoteId,
+                        cancellationToken);
+                if (parent == null || parent.IsArchived)
+                    note.ParentNoteId = Guid.Empty;
+            }
+
             await RecursiveRestore(note.Id);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return note.Id;
