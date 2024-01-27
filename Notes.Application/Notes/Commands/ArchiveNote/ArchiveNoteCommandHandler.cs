@@ -22,6 +22,7 @@ namespace Notes.Application.Notes.Commands.ArchiveNote
                 throw new NotFoundException(nameof(Note), request.Id);
 
             note.IsArchived = true;
+            note.IsPublished = false;
             await RecursiveArchive(note.Id);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return note.Id;
@@ -35,6 +36,7 @@ namespace Notes.Application.Notes.Commands.ArchiveNote
                 foreach (var child in children)
                 {
                     child.IsArchived = true;
+                    child.IsPublished = false;
                     await RecursiveArchive(child.Id);
                 }
             }
