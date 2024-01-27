@@ -12,6 +12,7 @@ using Notes.Application.Notes.Queries.GetNote;
 using Notes.Application.Notes.Queries.GetNotes;
 using Notes.Application.Notes.Queries.GetNotesCount;
 using Notes.Application.Notes.Queries.GetNotesTrash;
+using Notes.Application.Notes.Queries.GetPublicNote;
 using Notes.WebApi.Models;
 
 namespace Notes.WebApi.Controllers
@@ -267,6 +268,30 @@ namespace Notes.WebApi.Controllers
             };
             var notes = await Mediator.Send(query);
             return Ok(notes);
+        }
+
+        /// <summary>
+        /// Gets public note by id
+        /// </summary>
+        /// <param name="id">Note id (guid)</param>
+        /// <returns>Returns NoteVm</returns>
+        /// <response code="200">Success</response>
+        /// <response code="404">If the requested note is not found</response>
+        /// <response code="400">If the request is not validated</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("public/{id:guid}")]
+        public async Task<ActionResult<NoteVm>> GetPublicNote(Guid id)
+        {
+            var query = new GetPublicNoteQuery
+            {
+                Id = id,
+            };
+
+            var noteVm = await Mediator.Send(query);
+            return Ok(noteVm);
         }
     }
 }
