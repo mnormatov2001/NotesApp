@@ -1,8 +1,48 @@
-﻿namespace Notes.IdentityServer.Data
+﻿using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Mappers;
+using Microsoft.EntityFrameworkCore;
+
+namespace Notes.IdentityServer.Data
 {
     public class DbInitializer
     {
-        public static void Initialize(AuthDbContext authDbContext) => 
-            authDbContext.Database.EnsureCreated();
+        public static void Initialize(IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.CreateScope();
+            scope.ServiceProvider.GetRequiredService<AuthDbContext>().Database.Migrate();
+            scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+            var context = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+            context.Database.Migrate();
+
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            var config = new IdentityServerConfiguration(configuration);
+
+            if (!context.Clients.Any())
+            {
+                foreach (var client in config.Clients)
+                {
+                    context.Clients.Add(client.ToEntity());
+                }
+                context.SaveChanges();
+            }
+
+            if (!context.IdentityResources.Any())
+            {
+                foreach (var resource in config.IdentityResources)
+                {
+                    context.IdentityResources.Add(resource.ToEntity());
+                }
+                context.SaveChanges();
+            }
+
+            if (!context.ApiScopes.Any())
+            {
+                foreach (var resource in config.ApiScopes)
+                {
+                    context.ApiScopes.Add(resource.ToEntity());
+                }
+                context.SaveChanges();
+            }
+        }
     }
 }

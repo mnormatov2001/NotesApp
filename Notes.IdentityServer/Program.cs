@@ -16,9 +16,13 @@ namespace Notes.IdentityServer
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
+
             var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+
             builder.Services.AddDbContext<AuthDbContext>(options =>
-                options.UseNpgsql(connectionString));
+                options.UseNpgsql(connectionString,
+                    sql => sql.MigrationsAssembly(migrationsAssembly)));
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(config =>
             {
@@ -31,14 +35,23 @@ namespace Notes.IdentityServer
                 .AddEntityFrameworkStores<AuthDbContext>()
                 .AddDefaultTokenProviders();
 
-            var cfg = new IdentityServerConfiguration(builder.Configuration);
             builder.Services.AddIdentityServer()
                 .AddAspNetIdentity<AppUser>()
-                .AddInMemoryApiResources(cfg.ApiResources)
-                .AddInMemoryIdentityResources(cfg.IdentityResources)
-                .AddInMemoryApiScopes(cfg.ApiScopes)
-                .AddInMemoryClients(cfg.Clients)
+                .AddConfigurationStore(options =>
+                {
+                    options.ConfigureDbContext = dbBuilder =>
+                        dbBuilder.UseNpgsql(connectionString,
+                            sql => sql.MigrationsAssembly(migrationsAssembly));
+                })
+                .AddOperationalStore(options =>
+                {
+                    options.ConfigureDbContext = dbBuilder =>
+                        dbBuilder.UseNpgsql(connectionString,
+                            sql => sql.MigrationsAssembly(migrationsAssembly));
+                })
                 .AddDeveloperSigningCredential();
+
+            
 
             builder.Services.ConfigureApplicationCookie(config =>
             {
@@ -93,20 +106,7 @@ namespace Notes.IdentityServer
 
             app.MapDefaultControllerRoute();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var provider = scope.ServiceProvider;
-                try
-                {
-                    var dbContext = provider.GetRequiredService<AuthDbContext>();
-                    DbInitializer.Initialize(dbContext);
-                }
-                catch (Exception e)
-                {
-                    var logger = provider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(e, "An error occurred while app initialization");
-                }
-            }
+            DbInitializer.Initialize(app);
 
             app.Run();
         }
