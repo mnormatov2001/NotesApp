@@ -18,31 +18,22 @@ namespace Notes.IdentityServer.Data
             var config = new IdentityServerConfiguration(configuration);
 
             if (!context.Clients.Any())
-            {
                 foreach (var client in config.Clients)
-                {
                     context.Clients.Add(client.ToEntity());
-                }
-                context.SaveChanges();
-            }
 
             if (!context.IdentityResources.Any())
-            {
                 foreach (var resource in config.IdentityResources)
-                {
                     context.IdentityResources.Add(resource.ToEntity());
-                }
-                context.SaveChanges();
-            }
 
             if (!context.ApiScopes.Any())
-            {
                 foreach (var resource in config.ApiScopes)
-                {
                     context.ApiScopes.Add(resource.ToEntity());
-                }
-                context.SaveChanges();
-            }
+
+            if (!context.ApiResources.Any())
+                foreach (var resource in config.ApiResources)
+                    context.ApiResources.Add(resource.ToEntity());
+
+            context.SaveChanges();
         }
     }
 }
