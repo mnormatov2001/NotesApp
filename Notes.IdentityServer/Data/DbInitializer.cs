@@ -6,34 +6,48 @@ namespace Notes.IdentityServer.Data
 {
     public class DbInitializer
     {
-        public static void Initialize(IApplicationBuilder app)
+        private readonly IConfiguration _configuration;
+        private readonly AuthDbContext _authDbContext;
+        private readonly PersistedGrantDbContext _persistedGrantDbContext;
+        private readonly ConfigurationDbContext _configurationDbContext;
+
+        public DbInitializer(
+            IConfiguration configuration,
+            AuthDbContext authDbContext,
+            PersistedGrantDbContext persistedGrantDbContext,
+            ConfigurationDbContext configurationDbContext)
         {
-            using var scope = app.ApplicationServices.CreateScope();
-            scope.ServiceProvider.GetRequiredService<AuthDbContext>().Database.Migrate();
-            scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
-            var context = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-            context.Database.Migrate();
+            _configuration = configuration;
+            _authDbContext = authDbContext;
+            _persistedGrantDbContext = persistedGrantDbContext;
+            _configurationDbContext = configurationDbContext;
+        }
 
-            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-            var config = new IdentityServerConfiguration(configuration);
+        public void Initialize()
+        {
+            _authDbContext.Database.Migrate();
+            _persistedGrantDbContext.Database.Migrate();
+            _configurationDbContext.Database.Migrate();
 
-            if (!context.Clients.Any())
+            var config = new IdentityServerConfiguration(_configuration);
+
+            if (!_configurationDbContext.Clients.Any())
                 foreach (var client in config.Clients)
-                    context.Clients.Add(client.ToEntity());
+                    _configurationDbContext.Clients.Add(client.ToEntity());
 
-            if (!context.IdentityResources.Any())
+            if (!_configurationDbContext.IdentityResources.Any())
                 foreach (var resource in config.IdentityResources)
-                    context.IdentityResources.Add(resource.ToEntity());
+                    _configurationDbContext.IdentityResources.Add(resource.ToEntity());
 
-            if (!context.ApiScopes.Any())
+            if (!_configurationDbContext.ApiScopes.Any())
                 foreach (var resource in config.ApiScopes)
-                    context.ApiScopes.Add(resource.ToEntity());
+                    _configurationDbContext.ApiScopes.Add(resource.ToEntity());
 
-            if (!context.ApiResources.Any())
+            if (!_configurationDbContext.ApiResources.Any())
                 foreach (var resource in config.ApiResources)
-                    context.ApiResources.Add(resource.ToEntity());
+                    _configurationDbContext.ApiResources.Add(resource.ToEntity());
 
-            context.SaveChanges();
+            _configurationDbContext.SaveChanges();
         }
     }
 }

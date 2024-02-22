@@ -24,6 +24,8 @@ namespace Notes.IdentityServer
                 options.UseNpgsql(connectionString,
                     sql => sql.MigrationsAssembly(migrationsAssembly)));
 
+            builder.Services.AddScoped<DbInitializer>();
+
             builder.Services.AddIdentity<AppUser, IdentityRole>(config =>
             {
                 config.Password.RequiredLength = 5;
@@ -106,7 +108,20 @@ namespace Notes.IdentityServer
 
             app.MapDefaultControllerRoute();
 
-            DbInitializer.Initialize(app);
+            using (var scope = app.Services.CreateScope())
+            {
+                var provider = scope.ServiceProvider;
+                try
+                {
+                    provider.GetRequiredService<DbInitializer>()
+                        .Initialize();
+                }
+                catch (Exception e)
+                {
+                    var logger = provider.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(e, "An error occurred while app initialization");
+                }
+            }
 
             app.Run();
         }
