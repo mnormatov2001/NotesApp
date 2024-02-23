@@ -7,9 +7,6 @@ using Notes.IdentityServer.Models;
 using Notes.IdentityServer.Services;
 using Notes.IdentityServer.Services.Interfaces;
 using System.Reflection;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 
 namespace Notes.IdentityServer
 {
@@ -53,15 +50,10 @@ namespace Notes.IdentityServer
                     options.ConfigureDbContext = dbBuilder =>
                         dbBuilder.UseNpgsql(connectionString,
                             sql => sql.MigrationsAssembly(migrationsAssembly));
+
+                    options.EnableTokenCleanup = true;
                 })
                 .AddDeveloperSigningCredential();
-
-            builder.Services.AddDataProtection().UseCryptographicAlgorithms(
-                new AuthenticatedEncryptorConfiguration
-                {
-                    EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
-                    ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
-                });
 
             builder.Services.ConfigureApplicationCookie(config =>
             {
