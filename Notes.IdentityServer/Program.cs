@@ -32,6 +32,7 @@ namespace Notes.IdentityServer
                 config.Password.RequireNonAlphanumeric = false;
                 config.Password.RequireDigit = false;
                 config.Password.RequireUppercase = false;
+                config.Password.RequireLowercase = false;
                 config.User.RequireUniqueEmail = true;
             })
                 .AddEntityFrameworkStores<AuthDbContext>()

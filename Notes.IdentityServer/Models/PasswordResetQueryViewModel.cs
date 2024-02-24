@@ -1,14 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+#nullable disable
 namespace Notes.IdentityServer.Models
 {
     public class PasswordResetQueryViewModel
     {
-        #nullable disable
-        [Required(ErrorMessage = "*Это поле является обязательным.")]
+        [Required]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         public string Email { get; set; }
+
         public string ReturnUrl { get; set; }
     }
 }

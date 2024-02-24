@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+#nullable disable
 namespace Notes.IdentityServer.Models
 {
     public class ChangePasswordViewModel
     {
-        #nullable disable
         [Required]
         public string CurrentPassword { get; set; }
+
         [Required]
-        [StringLength(20, MinimumLength = 5)]
-        [RegularExpression(".*[a-z].*")]
+        [MinLength(5)]
+        [MaxLength(128)]
         [DataType(DataType.Password)]
         public string NewPassword { get; set; }
     }

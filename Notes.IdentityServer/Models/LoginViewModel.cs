@@ -1,20 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+#nullable disable
 namespace Notes.IdentityServer.Models
 {
     public class LoginViewModel
     {
-        #nullable disable
-        [Required(ErrorMessage = "*Это поле является обязательным.")]
+        [Required]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         public string Email { get; set; }
-        [Required(ErrorMessage = "*Это поле является обязательным.")]
+
+        [Required]
         [DataType(DataType.Password)]
-        [StringLength(20, ErrorMessage = "*Неверный пароль.", MinimumLength = 5)]
-        [RegularExpression(".*[a-z].*",
-            ErrorMessage = "*Неверный пароль.")]
         public string Password { get; set; }
+
         public string ReturnUrl { get; set; }
     }
 }
