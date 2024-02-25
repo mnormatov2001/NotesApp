@@ -1,4 +1,4 @@
-FROM bitnami/dotnet-sdk:6.0.416 AS builder
+FROM bitnami/dotnet-sdk:8 AS builder
 EXPOSE 5007
 EXPOSE 7090
 
