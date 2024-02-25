@@ -8,122 +8,115 @@ using Notes.IdentityServer.Services;
 using Notes.IdentityServer.Services.Interfaces;
 using System.Reflection;
 
-namespace Notes.IdentityServer;
 
-public class Program
-{
-    public static void Main(string[] args)
+var builder = WebApplication.CreateBuilder(args);
+
+var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
+
+var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+
+builder.Services.AddDbContext<AuthDbContext>(options =>
+    options.UseNpgsql(connectionString,
+        sql => sql.MigrationsAssembly(migrationsAssembly)));
+
+builder.Services.AddScoped<DbInitializer>();
+
+builder.Services.AddIdentity<AppUser, IdentityRole>(config =>
     {
-            var builder = WebApplication.CreateBuilder(args);
+        config.Password.RequiredLength = 5;
+        config.Password.RequireNonAlphanumeric = false;
+        config.Password.RequireDigit = false;
+        config.Password.RequireUppercase = false;
+        config.Password.RequireLowercase = false;
+        config.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
 
-            var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
+builder.Services.AddIdentityServer()
+    .AddAspNetIdentity<AppUser>()
+    .AddConfigurationStore(options =>
+    {
+        options.ConfigureDbContext = dbBuilder =>
+            dbBuilder.UseNpgsql(connectionString,
+                sql => sql.MigrationsAssembly(migrationsAssembly));
+    })
+    .AddOperationalStore(options =>
+    {
+        options.ConfigureDbContext = dbBuilder =>
+            dbBuilder.UseNpgsql(connectionString,
+                sql => sql.MigrationsAssembly(migrationsAssembly));
 
-            var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+        options.EnableTokenCleanup = true;
+    })
+    .AddDeveloperSigningCredential();
 
-            builder.Services.AddDbContext<AuthDbContext>(options =>
-                options.UseNpgsql(connectionString,
-                    sql => sql.MigrationsAssembly(migrationsAssembly)));
+builder.Services.ConfigureApplicationCookie(config =>
+{
+    config.Cookie.Name = "notesApp.Identity.cooke";
+    config.LoginPath = "/Auth/Login";
+    config.LogoutPath = "/Auth/Logout";
+    config.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    config.Cookie.HttpOnly = true;
+});
 
-            builder.Services.AddScoped<DbInitializer>();
+builder.Services.AddControllersWithViews();
 
-            builder.Services.AddIdentity<AppUser, IdentityRole>(config =>
-            {
-                config.Password.RequiredLength = 5;
-                config.Password.RequireNonAlphanumeric = false;
-                config.Password.RequireDigit = false;
-                config.Password.RequireUppercase = false;
-                config.Password.RequireLowercase = false;
-                config.User.RequireUniqueEmail = true;
-            })
-                .AddEntityFrameworkStores<AuthDbContext>()
-                .AddDefaultTokenProviders();
+builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
+builder.Services.AddSingleton<EmailService>();
 
-            builder.Services.AddIdentityServer()
-                .AddAspNetIdentity<AppUser>()
-                .AddConfigurationStore(options =>
-                {
-                    options.ConfigureDbContext = dbBuilder =>
-                        dbBuilder.UseNpgsql(connectionString,
-                            sql => sql.MigrationsAssembly(migrationsAssembly));
-                })
-                .AddOperationalStore(options =>
-                {
-                    options.ConfigureDbContext = dbBuilder =>
-                        dbBuilder.UseNpgsql(connectionString,
-                            sql => sql.MigrationsAssembly(migrationsAssembly));
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+});
 
-                    options.EnableTokenCleanup = true;
-                })
-                .AddDeveloperSigningCredential();
+var app = builder.Build();
 
-            builder.Services.ConfigureApplicationCookie(config =>
-            {
-                config.Cookie.Name = "notesApp.Identity.cooke";
-                config.LoginPath = "/Auth/Login";
-                config.LogoutPath = "/Auth/Logout";
-                config.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                config.Cookie.HttpOnly = true;
-            });
+if (app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
 
-            builder.Services.AddControllersWithViews();
+app.UseSwagger();
+app.UseSwaggerUI(config =>
+{
+    config.RoutePrefix = string.Empty;
+    config.SwaggerEndpoint("swagger/v1/swagger.json", "notes.app-IdentityServer");
+});
 
-            builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
-            builder.Services.AddSingleton<EmailService>();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(app.Environment.ContentRootPath, "wwwroot"))
+});
 
-            builder.Services.AddSwaggerGen(options =>
-            {
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                options.IncludeXmlComments(xmlPath);
-            });
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    Secure = CookieSecurePolicy.Always,
+    HttpOnly = HttpOnlyPolicy.Always
+});
 
-            var app = builder.Build();
+app.UseRouting();
+app.UseIdentityServer();
 
-            if (app.Environment.IsDevelopment())
-                app.UseDeveloperExceptionPage();
+if (app.Environment.IsProduction())
+    app.UseHttpsRedirection();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(config =>
-            {
-                config.RoutePrefix = string.Empty;
-                config.SwaggerEndpoint("swagger/v1/swagger.json", "notes.app-IdentityServer");
-            });
+app.MapDefaultControllerRoute();
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(app.Environment.ContentRootPath, "wwwroot"))
-            });
-
-            app.UseCookiePolicy(new CookiePolicyOptions
-            {
-                Secure = CookieSecurePolicy.Always, 
-                HttpOnly = HttpOnlyPolicy.Always
-            });
-
-            app.UseRouting();
-            app.UseIdentityServer();
-
-            if (app.Environment.IsProduction())
-                app.UseHttpsRedirection();
-
-            app.MapDefaultControllerRoute();
-
-            using (var scope = app.Services.CreateScope())
-            {
-                var provider = scope.ServiceProvider;
-                try
-                {
-                    provider.GetRequiredService<DbInitializer>()
-                        .Initialize();
-                }
-                catch (Exception e)
-                {
-                    var logger = provider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(e, "An error occurred while app initialization");
-                }
-            }
-
-            app.Run();
-        }
+using (var scope = app.Services.CreateScope())
+{
+    var provider = scope.ServiceProvider;
+    try
+    {
+        provider.GetRequiredService<DbInitializer>()
+            .Initialize();
+    }
+    catch (Exception e)
+    {
+        var logger = provider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(e, "An error occurred while app initialization");
+    }
 }
+
+app.Run();
