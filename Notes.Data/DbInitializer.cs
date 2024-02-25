@@ -1,10 +1,12 @@
-﻿namespace Notes.Data
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Notes.Data
 {
     public class DbInitializer
     {
         public static void Initialize(NotesDbContext context)
         {
-            context.Database.EnsureCreated();
+            context.Database.Migrate();
         }
     }
 }
