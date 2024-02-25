@@ -2,10 +2,10 @@
 
 namespace Notes.Application.Notes.Queries.GetPublicNote;
 
-public class GetPublicNoteQueryValidator: AbstractValidator<GetPublicNoteQuery>
+public class GetPublicNoteQueryValidator : AbstractValidator<GetPublicNoteQuery>
 {
     public GetPublicNoteQueryValidator()
     {
-            RuleFor(query => query.Id).NotEqual(Guid.Empty);
-        }
+        RuleFor(query => query.Id).NotEqual(Guid.Empty);
+    }
 }

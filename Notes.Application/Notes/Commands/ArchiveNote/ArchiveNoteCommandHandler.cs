@@ -6,7 +6,7 @@ using Notes.Domain;
 
 namespace Notes.Application.Notes.Commands.ArchiveNote;
 
-public class ArchiveNoteCommandHandler: IRequestHandler<ArchiveNoteCommand, Guid>
+public class ArchiveNoteCommandHandler : IRequestHandler<ArchiveNoteCommand, Guid>
 {
     private readonly INotesDbContext _dbContext;
 

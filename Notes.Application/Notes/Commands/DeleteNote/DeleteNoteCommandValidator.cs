@@ -6,7 +6,7 @@ public class DeleteNoteCommandValidator : AbstractValidator<DeleteNoteCommand>
 {
     public DeleteNoteCommandValidator()
     {
-            RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
-            RuleFor(cmd => cmd.Id).NotEqual(Guid.Empty);
-        }
+        RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
+        RuleFor(cmd => cmd.Id).NotEqual(Guid.Empty);
+    }
 }

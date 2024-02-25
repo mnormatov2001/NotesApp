@@ -6,7 +6,7 @@ using Notes.Domain;
 
 namespace Notes.Application.Notes.Commands.RestoreNote;
 
-internal class RestoreNoteCommandHandler: IRequestHandler<RestoreNoteCommand, Guid>
+internal class RestoreNoteCommandHandler : IRequestHandler<RestoreNoteCommand, Guid>
 {
     private readonly INotesDbContext _dbContext;
 
@@ -15,41 +15,41 @@ internal class RestoreNoteCommandHandler: IRequestHandler<RestoreNoteCommand, Gu
 
     public async Task<Guid> Handle(RestoreNoteCommand request, CancellationToken cancellationToken)
     {
-            var note = await _dbContext.Notes.FirstOrDefaultAsync(entity =>
-                entity.Id == request.Id, cancellationToken);
+        var note = await _dbContext.Notes.FirstOrDefaultAsync(entity =>
+            entity.Id == request.Id, cancellationToken);
 
-            if (note == null || note.UserId != request.UserId)
-                throw new NotFoundException(nameof(Note), request.Id);
+        if (note == null || note.UserId != request.UserId)
+            throw new NotFoundException(nameof(Note), request.Id);
 
-            if (note.IsArchived == false)
-                return note.Id;
-
-            note.IsArchived = false;
-            if (note.ParentNoteId != Guid.Empty)
-            {
-                var parent =
-                    await _dbContext.Notes.FirstOrDefaultAsync(entity => entity.Id == note.ParentNoteId,
-                        cancellationToken);
-                if (parent == null || parent.IsArchived)
-                    note.ParentNoteId = Guid.Empty;
-            }
-
-            await RecursiveRestore(note.Id);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+        if (note.IsArchived == false)
             return note.Id;
 
-            async Task RecursiveRestore(Guid noteId)
-            {
-                var children = await _dbContext.Notes
-                    .Where(entity => entity.UserId == request.UserId &&
-                                     entity.ParentNoteId == noteId && entity.IsArchived)
-                    .ToListAsync(cancellationToken);
+        note.IsArchived = false;
+        if (note.ParentNoteId != Guid.Empty)
+        {
+            var parent =
+                await _dbContext.Notes.FirstOrDefaultAsync(entity => entity.Id == note.ParentNoteId,
+                    cancellationToken);
+            if (parent == null || parent.IsArchived)
+                note.ParentNoteId = Guid.Empty;
+        }
 
-                foreach (var child in children)
-                {
-                    child.IsArchived = false;
-                    await RecursiveRestore(child.Id);
-                }
+        await RecursiveRestore(note.Id);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return note.Id;
+
+        async Task RecursiveRestore(Guid noteId)
+        {
+            var children = await _dbContext.Notes
+                .Where(entity => entity.UserId == request.UserId &&
+                                 entity.ParentNoteId == noteId && entity.IsArchived)
+                .ToListAsync(cancellationToken);
+
+            foreach (var child in children)
+            {
+                child.IsArchived = false;
+                await RecursiveRestore(child.Id);
             }
         }
+    }
 }

@@ -14,12 +14,12 @@ public class AccountController : ControllerBase
     private readonly UserManager<AppUser> _userManager;
     private readonly EmailService _emailService;
 
-    public AccountController(UserManager<AppUser> userManager, 
+    public AccountController(UserManager<AppUser> userManager,
         EmailService emailService)
     {
-            _userManager = userManager;
-            _emailService = emailService;
-        }
+        _userManager = userManager;
+        _emailService = emailService;
+    }
 
     /// <summary>
     /// Requests account confirmation email for specified email address.
@@ -40,36 +40,36 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> RequestConfirmationEmail(
         [EmailAddress] string email)
     {
-            if (User.Identity?.IsAuthenticated != true)
-                return Unauthorized();
+        if (User.Identity?.IsAuthenticated != true)
+            return Unauthorized();
 
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return BadRequest(new { error = $"'{email}' is not registered." });
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+            return BadRequest(new { error = $"'{email}' is not registered." });
 
-            if (user.EmailConfirmed)
-                return Conflict(new { error = $"'{email}' is already confirmed" });
+        if (user.EmailConfirmed)
+            return Conflict(new { error = $"'{email}' is already confirmed" });
 
-            var success = await SendConfirmationEmail(user);
-            if (!success)
-                return Problem("failed to send email", 
-                    statusCode: StatusCodes.Status500InternalServerError, 
-                    title: "InternalServerError");
+        var success = await SendConfirmationEmail(user);
+        if (!success)
+            return Problem("failed to send email",
+                statusCode: StatusCodes.Status500InternalServerError,
+                title: "InternalServerError");
 
-            return Ok();
-        }
+        return Ok();
+    }
 
     private async Task<bool> SendConfirmationEmail(AppUser user)
     {
-            var confirmationToken =
-                await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var confirmationToken =
+            await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var callbackUrl = Url.Action("ConfirmEmail", "Account",
-                new { email = user.Email, confirmationToken = confirmationToken },
-                Request.Scheme)!;
+        var callbackUrl = Url.Action("ConfirmEmail", "Account",
+            new { email = user.Email, confirmationToken = confirmationToken },
+            Request.Scheme)!;
 
-            return await _emailService.SendAccountConfirmationEmailAsync(user.Email, callbackUrl);
-        }
+        return await _emailService.SendAccountConfirmationEmailAsync(user.Email, callbackUrl);
+    }
 
     /// <summary>
     /// Confirms email for user's account.
@@ -89,25 +89,26 @@ public class AccountController : ControllerBase
         [EmailAddress] string email,
         [Required] string confirmationToken)
     {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return BadRequest(new { error = "Неверная ссылка подтверждения." });
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+            return BadRequest(new { error = "Неверная ссылка подтверждения." });
 
-            if (user.EmailConfirmed)
-                return Ok($"Почта '{email}' уже подтверждена!");
+        if (user.EmailConfirmed)
+            return Ok($"Почта '{email}' уже подтверждена!");
 
-            var result = await _userManager.ConfirmEmailAsync(user, confirmationToken);
-            if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(error.Code, error.Description);
+        var result = await _userManager.ConfirmEmailAsync(user, confirmationToken);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(error.Code, error.Description);
 
-                ModelState.AddModelError(string.Empty,
-                    "Не удалось подтвердить почту.");
-                return BadRequest(ModelState);
-            }
-            return Ok($"Почта '{email}' успешно подтверждена!");
+            ModelState.AddModelError(string.Empty,
+                "Не удалось подтвердить почту.");
+            return BadRequest(ModelState);
         }
+
+        return Ok($"Почта '{email}' успешно подтверждена!");
+    }
 
     /// <summary>
     /// Retrieves user information.
@@ -120,20 +121,20 @@ public class AccountController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> UserInfo()
     {
-            if (User.Identity?.IsAuthenticated != true)
-                return Unauthorized();
+        if (User.Identity?.IsAuthenticated != true)
+            return Unauthorized();
 
-            var email = User.FindFirst("email")?.Value;
-            var user = await _userManager.FindByEmailAsync(email);
-            var userInfo = new UserInfoViewModel
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                EmailConfirmed = user.EmailConfirmed
-            };
-            return Ok(userInfo);
-        }
+        var email = User.FindFirst("email")?.Value;
+        var user = await _userManager.FindByEmailAsync(email);
+        var userInfo = new UserInfoViewModel
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            EmailConfirmed = user.EmailConfirmed
+        };
+        return Ok(userInfo);
+    }
 
     /// <summary>
     /// changes password for the user account.
@@ -151,20 +152,20 @@ public class AccountController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
-            if (User.Identity?.IsAuthenticated != true)
-                return Unauthorized();
+        if (User.Identity?.IsAuthenticated != true)
+            return Unauthorized();
 
-            var email = User.FindFirst("email")?.Value;
-            var user = await _userManager.FindByEmailAsync(email);
-            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-            if (result.Succeeded)
-                return Ok();
+        var email = User.FindFirst("email")?.Value;
+        var user = await _userManager.FindByEmailAsync(email);
+        var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        if (result.Succeeded)
+            return Ok();
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError(error.Code, error.Description);
+        foreach (var error in result.Errors)
+            ModelState.AddModelError(error.Code, error.Description);
 
-            return Conflict(ModelState);
-        }
+        return Conflict(ModelState);
+    }
 
     /// <summary>
     /// Changes user's first and last name.
@@ -182,20 +183,20 @@ public class AccountController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> ChangeSubjectName(SubjectNameViewModel model)
     {
-            if (User.Identity?.IsAuthenticated != true)
-                return Unauthorized();
+        if (User.Identity?.IsAuthenticated != true)
+            return Unauthorized();
 
-            var email = User.FindFirst("email")?.Value;
-            var user = await _userManager.FindByEmailAsync(email);
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
-                return Ok();
+        var email = User.FindFirst("email")?.Value;
+        var user = await _userManager.FindByEmailAsync(email);
+        user.FirstName = model.FirstName;
+        user.LastName = model.LastName;
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+            return Ok();
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError(error.Code, error.Description);
+        foreach (var error in result.Errors)
+            ModelState.AddModelError(error.Code, error.Description);
 
-            return Conflict(ModelState);
-        }
+        return Conflict(ModelState);
+    }
 }

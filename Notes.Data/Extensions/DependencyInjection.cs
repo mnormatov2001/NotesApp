@@ -8,7 +8,7 @@ namespace Notes.Data.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDataBase(this IServiceCollection services, 
+    public static IServiceCollection AddDataBase(this IServiceCollection services,
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DbConnection");

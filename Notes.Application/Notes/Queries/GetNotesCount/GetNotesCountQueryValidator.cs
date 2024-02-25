@@ -6,6 +6,6 @@ public class GetNotesCountQueryValidator : AbstractValidator<GetNotesCountQuery>
 {
     public GetNotesCountQueryValidator()
     {
-            RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
-        }
+        RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
+    }
 }

@@ -10,7 +10,8 @@ public abstract class BaseApiController : ControllerBase
 {
 #nullable disable
     private IMediator _mediator;
-    protected IMediator Mediator => 
+
+    protected IMediator Mediator =>
         _mediator ??= HttpContext.RequestServices.GetRequiredService<IMediator>();
 
     internal Guid UserId => User.Identity is { IsAuthenticated: true }

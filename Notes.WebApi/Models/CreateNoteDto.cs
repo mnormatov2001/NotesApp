@@ -8,7 +8,7 @@ namespace Notes.WebApi.Models;
 public class CreateNoteDto : IMapWith<CreateNoteCommand>
 {
 #pragma warning disable CS8618
-        
+
     [Required]
     public string Title { get; set; }
     public string? Content { get; set; }
@@ -20,20 +20,20 @@ public class CreateNoteDto : IMapWith<CreateNoteCommand>
 
     public void Mapping(Profile profile)
     {
-            profile.CreateMap<CreateNoteDto, CreateNoteCommand>()
-                .ForMember(cmd => cmd.Title,
-                    opt => opt.MapFrom(dto => dto.Title))
-                .ForMember(cmd => cmd.Content,
-                    opt => opt.MapFrom(dto => dto.Content))
-                .ForMember(cmd => cmd.ParentNoteId,
-                    opt => opt.MapFrom(dto => dto.ParentNoteId))
-                .ForMember(cmd => cmd.Icon,
-                    opt => opt.MapFrom(dto => dto.Icon))
-                .ForMember(cmd => cmd.CoverImage,
-                    opt => opt.MapFrom(dto => dto.CoverImage))
-                .ForMember(cmd => cmd.IsArchived,
-                    opt => opt.MapFrom(dto => dto.IsArchived))
-                .ForMember(cmd => cmd.IsPublished,
-                    opt => opt.MapFrom(dto => dto.IsPublished));
-        }
+        profile.CreateMap<CreateNoteDto, CreateNoteCommand>()
+            .ForMember(cmd => cmd.Title,
+                opt => opt.MapFrom(dto => dto.Title))
+            .ForMember(cmd => cmd.Content,
+                opt => opt.MapFrom(dto => dto.Content))
+            .ForMember(cmd => cmd.ParentNoteId,
+                opt => opt.MapFrom(dto => dto.ParentNoteId))
+            .ForMember(cmd => cmd.Icon,
+                opt => opt.MapFrom(dto => dto.Icon))
+            .ForMember(cmd => cmd.CoverImage,
+                opt => opt.MapFrom(dto => dto.CoverImage))
+            .ForMember(cmd => cmd.IsArchived,
+                opt => opt.MapFrom(dto => dto.IsArchived))
+            .ForMember(cmd => cmd.IsPublished,
+                opt => opt.MapFrom(dto => dto.IsPublished));
+    }
 }

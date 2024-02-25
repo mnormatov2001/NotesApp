@@ -3,7 +3,7 @@
 public class Note
 {
 #pragma warning disable CS8618
-        
+
     public Guid UserId { get; set; }
     public Guid Id { get; set; }
     public Guid ParentNoteId { get; set; }

@@ -9,71 +9,70 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Notes.Data.Migrations.NotesDb
+namespace Notes.Data.Migrations.NotesDb;
+
+[DbContext(typeof(NotesDbContext))]
+[Migration("20240225062850_InitialNotesDbMigration")]
+partial class InitialNotesDbMigration
 {
-    [DbContext(typeof(NotesDbContext))]
-    [Migration("20240225062850_InitialNotesDbMigration")]
-    partial class InitialNotesDbMigration
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.16")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+        modelBuilder
+            .HasAnnotation("ProductVersion", "7.0.16")
+            .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+        NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Notes.Domain.Note", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Notes.Domain.Note", b =>
+        {
+            b.Property<Guid>("Id")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("uuid");
 
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
+            b.Property<string>("Content")
+                .HasColumnType("text");
 
-                    b.Property<string>("CoverImage")
-                        .HasColumnType("text");
+            b.Property<string>("CoverImage")
+                .HasColumnType("text");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+            b.Property<DateTime>("CreationDate")
+                .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("EditDate")
-                        .HasColumnType("timestamp with time zone");
+            b.Property<DateTime>("EditDate")
+                .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Icon")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+            b.Property<string>("Icon")
+                .HasMaxLength(10)
+                .HasColumnType("character varying(10)");
 
-                    b.Property<bool>("IsArchived")
-                        .HasColumnType("boolean");
+            b.Property<bool>("IsArchived")
+                .HasColumnType("boolean");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("boolean");
+            b.Property<bool>("IsPublished")
+                .HasColumnType("boolean");
 
-                    b.Property<Guid>("ParentNoteId")
-                        .HasColumnType("uuid");
+            b.Property<Guid>("ParentNoteId")
+                .HasColumnType("uuid");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
+            b.Property<string>("Title")
+                .IsRequired()
+                .HasMaxLength(250)
+                .HasColumnType("character varying(250)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+            b.Property<Guid>("UserId")
+                .HasColumnType("uuid");
 
-                    b.HasKey("Id");
+            b.HasKey("Id");
 
-                    b.HasIndex("Id")
-                        .IsUnique();
+            b.HasIndex("Id")
+                .IsUnique();
 
-                    b.HasIndex("ParentNoteId");
+            b.HasIndex("ParentNoteId");
 
-                    b.ToTable("Notes");
-                });
+            b.ToTable("Notes");
+        });
 #pragma warning restore 612, 618
-        }
     }
 }

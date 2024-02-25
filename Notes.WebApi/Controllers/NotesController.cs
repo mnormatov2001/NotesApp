@@ -23,7 +23,7 @@ public class NotesController : BaseApiController
 {
     private readonly IMapper _mapper;
 
-    public NotesController(IMapper mapper) => 
+    public NotesController(IMapper mapper) =>
         _mapper = mapper;
 
     /// <summary>
@@ -43,15 +43,15 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<NoteVm>> GetNote(Guid id)
     {
-            var query = new GetNoteQuery
-            {
-                Id = id,
-                UserId = UserId
-            };
+        var query = new GetNoteQuery
+        {
+            Id = id,
+            UserId = UserId
+        };
 
-            var noteVm = await Mediator.Send(query);
-            return Ok(noteVm);
-        }
+        var noteVm = await Mediator.Send(query);
+        return Ok(noteVm);
+    }
 
     /// <summary>
     /// Deletes the note by id
@@ -70,15 +70,15 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<Guid>> DeleteNote(Guid id)
     {
-            var cmd = new DeleteNoteCommand
-            {
-                Id = id,
-                UserId = UserId
-            };
+        var cmd = new DeleteNoteCommand
+        {
+            Id = id,
+            UserId = UserId
+        };
 
-            var result = await Mediator.Send(cmd);
-            return Ok(result);
-        }
+        var result = await Mediator.Send(cmd);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Archives the note
@@ -97,15 +97,15 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<Guid>> ArchiveNote(Guid id)
     {
-            var cmd = new ArchiveNoteCommand
-            {
-                Id = id,
-                UserId = UserId
-            };
+        var cmd = new ArchiveNoteCommand
+        {
+            Id = id,
+            UserId = UserId
+        };
 
-            var result = await Mediator.Send(cmd);
-            return Ok(result);
-        }
+        var result = await Mediator.Send(cmd);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Restores the note
@@ -124,15 +124,15 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<Guid>> RestoreNote(Guid id)
     {
-            var cmd = new RestoreNoteCommand
-            {
-                Id = id,
-                UserId = UserId
-            };
+        var cmd = new RestoreNoteCommand
+        {
+            Id = id,
+            UserId = UserId
+        };
 
-            var result = await Mediator.Send(cmd);
-            return Ok(result);
-        }
+        var result = await Mediator.Send(cmd);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Updates the note
@@ -151,11 +151,11 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<Guid>> UpdateNote([FromBody] UpdateNoteDto updateNoteDto)
     {
-            var cmd = _mapper.Map<UpdateNoteCommand>(updateNoteDto);
-            cmd.UserId = UserId;
-            var result = await Mediator.Send(cmd);
-            return Ok(result);
-        }
+        var cmd = _mapper.Map<UpdateNoteCommand>(updateNoteDto);
+        cmd.UserId = UserId;
+        var result = await Mediator.Send(cmd);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Creates the note
@@ -172,11 +172,11 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<Guid>> CreateNote([FromBody] CreateNoteDto createNoteDto)
     {
-            var cmd = _mapper.Map<CreateNoteCommand>(createNoteDto);
-            cmd.UserId = UserId;
-            var result = await Mediator.Send(cmd);
-            return Ok(result);
-        }
+        var cmd = _mapper.Map<CreateNoteCommand>(createNoteDto);
+        cmd.UserId = UserId;
+        var result = await Mediator.Send(cmd);
+        return Ok(result);
+    }
 
     /// <summary>
     /// Gets the number of child elements of a note
@@ -193,14 +193,14 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<int>> GetChildNotesCount(Guid parentNoteId)
     {
-            var query = new GetNotesCountQuery
-            {
-                UserId = UserId,
-                ParentNoteId = parentNoteId
-            };
-            var notesCount = await Mediator.Send(query);
-            return Ok(notesCount);
-        }
+        var query = new GetNotesCountQuery
+        {
+            UserId = UserId,
+            ParentNoteId = parentNoteId
+        };
+        var notesCount = await Mediator.Send(query);
+        return Ok(notesCount);
+    }
 
     /// <summary>
     /// Gets all child elements of a note
@@ -217,14 +217,14 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<IEnumerable<NoteVm>>> GetChildrenNotes(Guid parentNoteId)
     {
-            var query = new GetNotesQuery
-            {
-                UserId = UserId,
-                ParentNoteId = parentNoteId
-            };
-            var notes = await Mediator.Send(query);
-            return Ok(notes);
-        }
+        var query = new GetNotesQuery
+        {
+            UserId = UserId,
+            ParentNoteId = parentNoteId
+        };
+        var notes = await Mediator.Send(query);
+        return Ok(notes);
+    }
 
     /// <summary>
     /// Gets all notes
@@ -240,13 +240,13 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<IEnumerable<NoteVm>>> GetAllNotes()
     {
-            var query = new GetAllNotesQuery()
-            {
-                UserId = UserId,
-            };
-            var notes = await Mediator.Send(query);
-            return Ok(notes);
-        }
+        var query = new GetAllNotesQuery()
+        {
+            UserId = UserId,
+        };
+        var notes = await Mediator.Send(query);
+        return Ok(notes);
+    }
 
     /// <summary>
     /// Gets notes trash
@@ -262,13 +262,13 @@ public class NotesController : BaseApiController
     [Authorize]
     public async Task<ActionResult<IEnumerable<NoteVm>>> GetNotesTrash()
     {
-            var query = new GetNotesTrashQuery
-            {
-                UserId = UserId,
-            };
-            var notes = await Mediator.Send(query);
-            return Ok(notes);
-        }
+        var query = new GetNotesTrashQuery
+        {
+            UserId = UserId,
+        };
+        var notes = await Mediator.Send(query);
+        return Ok(notes);
+    }
 
     /// <summary>
     /// Gets public note by id
@@ -285,12 +285,12 @@ public class NotesController : BaseApiController
     [HttpGet("public/{id:guid}")]
     public async Task<ActionResult<NoteVm>> GetPublicNote(Guid id)
     {
-            var query = new GetPublicNoteQuery
-            {
-                Id = id,
-            };
+        var query = new GetPublicNoteQuery
+        {
+            Id = id,
+        };
 
-            var noteVm = await Mediator.Send(query);
-            return Ok(noteVm);
-        }
+        var noteVm = await Mediator.Send(query);
+        return Ok(noteVm);
+    }
 }
