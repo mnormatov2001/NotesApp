@@ -2,14 +2,14 @@
 
 #nullable disable
 
-namespace Notes.IdentityServer.Data.Migrations.AuthDb
+namespace Notes.IdentityServer.Data.Migrations.AuthDb;
+
+/// <inheritdoc />
+public partial class SecondAuthDbMigration : Migration
 {
     /// <inheritdoc />
-    public partial class SecondAuthDbMigration : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
             migrationBuilder.AlterColumn<string>(
                 name: "LastName",
                 table: "Users",
@@ -31,9 +31,9 @@ namespace Notes.IdentityServer.Data.Migrations.AuthDb
                 oldNullable: true);
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
             migrationBuilder.AlterColumn<string>(
                 name: "LastName",
                 table: "Users",
@@ -54,5 +54,4 @@ namespace Notes.IdentityServer.Data.Migrations.AuthDb
                 oldMaxLength: 128,
                 oldNullable: true);
         }
-    }
 }

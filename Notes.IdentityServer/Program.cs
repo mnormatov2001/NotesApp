@@ -8,12 +8,12 @@ using Notes.IdentityServer.Services;
 using Notes.IdentityServer.Services.Interfaces;
 using System.Reflection;
 
-namespace Notes.IdentityServer
+namespace Notes.IdentityServer;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
             var builder = WebApplication.CreateBuilder(args);
 
             var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
@@ -126,5 +126,4 @@ namespace Notes.IdentityServer
 
             app.Run();
         }
-    }
 }

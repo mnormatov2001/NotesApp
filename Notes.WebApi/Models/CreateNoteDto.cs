@@ -3,23 +3,23 @@ using Notes.Application.Common.Mappings;
 using Notes.Application.Notes.Commands.CreateNote;
 using System.ComponentModel.DataAnnotations;
 
-namespace Notes.WebApi.Models
+namespace Notes.WebApi.Models;
+
+public class CreateNoteDto : IMapWith<CreateNoteCommand>
 {
-    public class CreateNoteDto : IMapWith<CreateNoteCommand>
-    {
 #pragma warning disable CS8618
         
-        [Required]
-        public string Title { get; set; }
-        public string? Content { get; set; }
-        public Guid ParentNoteId { get; set; }
-        public string? Icon { get; set; }
-        public string? CoverImage { get; set; }
-        public bool IsArchived { get; set; }
-        public bool IsPublished { get; set; }
+    [Required]
+    public string Title { get; set; }
+    public string? Content { get; set; }
+    public Guid ParentNoteId { get; set; }
+    public string? Icon { get; set; }
+    public string? CoverImage { get; set; }
+    public bool IsArchived { get; set; }
+    public bool IsPublished { get; set; }
 
-        public void Mapping(Profile profile)
-        {
+    public void Mapping(Profile profile)
+    {
             profile.CreateMap<CreateNoteDto, CreateNoteCommand>()
                 .ForMember(cmd => cmd.Title,
                     opt => opt.MapFrom(dto => dto.Title))
@@ -36,5 +36,4 @@ namespace Notes.WebApi.Models
                 .ForMember(cmd => cmd.IsPublished,
                     opt => opt.MapFrom(dto => dto.IsPublished));
         }
-    }
 }

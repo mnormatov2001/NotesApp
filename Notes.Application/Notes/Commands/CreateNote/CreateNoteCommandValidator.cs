@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 
-namespace Notes.Application.Notes.Commands.CreateNote
+namespace Notes.Application.Notes.Commands.CreateNote;
+
+public class CreateNoteCommandValidator : AbstractValidator<CreateNoteCommand>
 {
-    public class CreateNoteCommandValidator : AbstractValidator<CreateNoteCommand>
+    public CreateNoteCommandValidator()
     {
-        public CreateNoteCommandValidator()
-        {
             RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
             RuleFor(cmd => cmd.Title)
                 .Must(str => !string.IsNullOrWhiteSpace(str))
@@ -14,5 +14,4 @@ namespace Notes.Application.Notes.Commands.CreateNote
                 .Must(str => str == null || !string.IsNullOrWhiteSpace(str))
                 .MaximumLength(10);
         }
-    }
 }

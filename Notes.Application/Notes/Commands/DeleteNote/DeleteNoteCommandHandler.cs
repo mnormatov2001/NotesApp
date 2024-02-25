@@ -4,17 +4,17 @@ using Notes.Application.Common.Exceptions;
 using Notes.Application.Interfaces;
 using Notes.Domain;
 
-namespace Notes.Application.Notes.Commands.DeleteNote
+namespace Notes.Application.Notes.Commands.DeleteNote;
+
+internal class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, Guid>
 {
-    internal class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, Guid>
+    private readonly INotesDbContext _dbContext;
+
+    public DeleteNoteCommandHandler(INotesDbContext dbContext) => 
+        _dbContext = dbContext;
+
+    public async Task<Guid> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
     {
-        private readonly INotesDbContext _dbContext;
-
-        public DeleteNoteCommandHandler(INotesDbContext dbContext) => 
-            _dbContext = dbContext;
-
-        public async Task<Guid> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
-        {
             var note = await _dbContext.Notes.FirstOrDefaultAsync(entity =>
                 entity.Id == request.Id, cancellationToken);
 
@@ -26,5 +26,4 @@ namespace Notes.Application.Notes.Commands.DeleteNote
 
             return note.Id;
         }
-    }
 }

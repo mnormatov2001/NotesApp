@@ -4,14 +4,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Notes.IdentityServer.Data.Migrations.ConfigurationDb
+namespace Notes.IdentityServer.Data.Migrations.ConfigurationDb;
+
+/// <inheritdoc />
+public partial class InitialConfigurationDbMigration : Migration
 {
     /// <inheritdoc />
-    public partial class InitialConfigurationDbMigration : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
             migrationBuilder.CreateTable(
                 name: "ApiResources",
                 columns: table => new
@@ -593,9 +593,9 @@ namespace Notes.IdentityServer.Data.Migrations.ConfigurationDb
                 unique: true);
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
             migrationBuilder.DropTable(
                 name: "ApiResourceClaims");
 
@@ -659,5 +659,4 @@ namespace Notes.IdentityServer.Data.Migrations.ConfigurationDb
             migrationBuilder.DropTable(
                 name: "IdentityResources");
         }
-    }
 }

@@ -3,14 +3,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Notes.Data.Migrations.NotesDb
+namespace Notes.Data.Migrations.NotesDb;
+
+/// <inheritdoc />
+public partial class InitialNotesDbMigration : Migration
 {
     /// <inheritdoc />
-    public partial class InitialNotesDbMigration : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
             migrationBuilder.CreateTable(
                 name: "Notes",
                 columns: table => new
@@ -44,11 +44,10 @@ namespace Notes.Data.Migrations.NotesDb
                 column: "ParentNoteId");
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
             migrationBuilder.DropTable(
                 name: "Notes");
         }
-    }
 }

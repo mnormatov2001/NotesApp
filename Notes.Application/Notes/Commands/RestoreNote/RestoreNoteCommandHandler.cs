@@ -4,17 +4,17 @@ using Notes.Application.Common.Exceptions;
 using Notes.Application.Interfaces;
 using Notes.Domain;
 
-namespace Notes.Application.Notes.Commands.RestoreNote
+namespace Notes.Application.Notes.Commands.RestoreNote;
+
+internal class RestoreNoteCommandHandler: IRequestHandler<RestoreNoteCommand, Guid>
 {
-    internal class RestoreNoteCommandHandler: IRequestHandler<RestoreNoteCommand, Guid>
+    private readonly INotesDbContext _dbContext;
+
+    public RestoreNoteCommandHandler(INotesDbContext dbContext) =>
+        _dbContext = dbContext;
+
+    public async Task<Guid> Handle(RestoreNoteCommand request, CancellationToken cancellationToken)
     {
-        private readonly INotesDbContext _dbContext;
-
-        public RestoreNoteCommandHandler(INotesDbContext dbContext) =>
-            _dbContext = dbContext;
-
-        public async Task<Guid> Handle(RestoreNoteCommand request, CancellationToken cancellationToken)
-        {
             var note = await _dbContext.Notes.FirstOrDefaultAsync(entity =>
                 entity.Id == request.Id, cancellationToken);
 
@@ -52,5 +52,4 @@ namespace Notes.Application.Notes.Commands.RestoreNote
                 }
             }
         }
-    }
 }

@@ -4,18 +4,18 @@ using Notes.Application.Common.Exceptions;
 using Notes.Application.Interfaces;
 using Notes.Domain;
 
-namespace Notes.Application.Notes.Commands.UpdateNote
+namespace Notes.Application.Notes.Commands.UpdateNote;
+
+internal class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Guid>
 {
-    internal class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Guid>
+    private readonly INotesDbContext _dbContext;
+
+    public UpdateNoteCommandHandler(INotesDbContext dbContext) => 
+        _dbContext = dbContext;
+
+    public async Task<Guid> Handle(UpdateNoteCommand request, 
+        CancellationToken cancellationToken)
     {
-        private readonly INotesDbContext _dbContext;
-
-        public UpdateNoteCommandHandler(INotesDbContext dbContext) => 
-            _dbContext = dbContext;
-
-        public async Task<Guid> Handle(UpdateNoteCommand request, 
-            CancellationToken cancellationToken)
-        {
             var note = await _dbContext.Notes.FirstOrDefaultAsync(entity => 
                 entity.Id == request.Id, cancellationToken);
 
@@ -35,5 +35,4 @@ namespace Notes.Application.Notes.Commands.UpdateNote
 
             return note.Id;
         }
-    }
 }

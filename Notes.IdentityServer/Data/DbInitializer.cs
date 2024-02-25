@@ -2,29 +2,29 @@
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.EntityFrameworkCore;
 
-namespace Notes.IdentityServer.Data
-{
-    public class DbInitializer
-    {
-        private readonly IConfiguration _configuration;
-        private readonly AuthDbContext _authDbContext;
-        private readonly PersistedGrantDbContext _persistedGrantDbContext;
-        private readonly ConfigurationDbContext _configurationDbContext;
+namespace Notes.IdentityServer.Data;
 
-        public DbInitializer(
-            IConfiguration configuration,
-            AuthDbContext authDbContext,
-            PersistedGrantDbContext persistedGrantDbContext,
-            ConfigurationDbContext configurationDbContext)
-        {
+public class DbInitializer
+{
+    private readonly IConfiguration _configuration;
+    private readonly AuthDbContext _authDbContext;
+    private readonly PersistedGrantDbContext _persistedGrantDbContext;
+    private readonly ConfigurationDbContext _configurationDbContext;
+
+    public DbInitializer(
+        IConfiguration configuration,
+        AuthDbContext authDbContext,
+        PersistedGrantDbContext persistedGrantDbContext,
+        ConfigurationDbContext configurationDbContext)
+    {
             _configuration = configuration;
             _authDbContext = authDbContext;
             _persistedGrantDbContext = persistedGrantDbContext;
             _configurationDbContext = configurationDbContext;
         }
 
-        public void Initialize()
-        {
+    public void Initialize()
+    {
             _authDbContext.Database.Migrate();
             _persistedGrantDbContext.Database.Migrate();
             _configurationDbContext.Database.Migrate();
@@ -49,5 +49,4 @@ namespace Notes.IdentityServer.Data
 
             _configurationDbContext.SaveChanges();
         }
-    }
 }

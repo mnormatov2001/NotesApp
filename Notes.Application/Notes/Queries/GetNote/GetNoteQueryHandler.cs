@@ -6,21 +6,21 @@ using Notes.Application.Interfaces;
 using Notes.Application.Notes.DTOs;
 using Notes.Domain;
 
-namespace Notes.Application.Notes.Queries.GetNote
-{
-    internal class GetNoteQueryHandler : IRequestHandler<GetNoteQuery, NoteVm>
-    {
-        private readonly INotesDbContext _dbContext;
-        private readonly IMapper _mapper;
+namespace Notes.Application.Notes.Queries.GetNote;
 
-        public GetNoteQueryHandler(INotesDbContext dbContext, IMapper mapper)
-        {
+internal class GetNoteQueryHandler : IRequestHandler<GetNoteQuery, NoteVm>
+{
+    private readonly INotesDbContext _dbContext;
+    private readonly IMapper _mapper;
+
+    public GetNoteQueryHandler(INotesDbContext dbContext, IMapper mapper)
+    {
             _dbContext = dbContext;
             _mapper = mapper;
         }
 
-        public async Task<NoteVm> Handle(GetNoteQuery request, CancellationToken cancellationToken)
-        {
+    public async Task<NoteVm> Handle(GetNoteQuery request, CancellationToken cancellationToken)
+    {
             var note = await _dbContext.Notes.FirstOrDefaultAsync(entity =>
                 entity.Id == request.Id, cancellationToken);
 
@@ -29,5 +29,4 @@ namespace Notes.Application.Notes.Queries.GetNote
 
             return _mapper.Map<NoteVm>(note);
         }
-    }
 }

@@ -5,29 +5,29 @@ using Notes.IdentityServer.Models;
 using System.ComponentModel.DataAnnotations;
 using Notes.IdentityServer.Services;
 
-namespace Notes.IdentityServer.Controllers
-{
-    public class AuthController : Controller
-    {
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly IIdentityServerInteractionService _interactionService;
-        private readonly EmailService _emailService;
+namespace Notes.IdentityServer.Controllers;
 
-        public AuthController(SignInManager<AppUser> signInManager, 
-            UserManager<AppUser> userManager, 
-            IIdentityServerInteractionService interactionService,
-            EmailService emailService)
-        {
+public class AuthController : Controller
+{
+    private readonly SignInManager<AppUser> _signInManager;
+    private readonly UserManager<AppUser> _userManager;
+    private readonly IIdentityServerInteractionService _interactionService;
+    private readonly EmailService _emailService;
+
+    public AuthController(SignInManager<AppUser> signInManager, 
+        UserManager<AppUser> userManager, 
+        IIdentityServerInteractionService interactionService,
+        EmailService emailService)
+    {
             _signInManager = signInManager;
             _userManager = userManager;
             _interactionService = interactionService;
             _emailService = emailService;
         }
 
-        [HttpGet]
-        public IActionResult Login([Url] string returnUrl)
-        {
+    [HttpGet]
+    public IActionResult Login([Url] string returnUrl)
+    {
             if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
                 return BadRequest(ModelState);
 
@@ -37,9 +37,9 @@ namespace Notes.IdentityServer.Controllers
             return View((loginVm, passwordResetQueryVm));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel loginVm)
-        {
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel loginVm)
+    {
             var passwordResetQueryVm = new PasswordResetQueryViewModel 
                 { Email = loginVm.Email, ReturnUrl = loginVm.ReturnUrl };
 
@@ -69,9 +69,9 @@ namespace Notes.IdentityServer.Controllers
             return Redirect(loginVm.ReturnUrl);
         }
 
-        [HttpGet]
-        public IActionResult Register([Url] string returnUrl)
-        {
+    [HttpGet]
+    public IActionResult Register([Url] string returnUrl)
+    {
             if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
                 return BadRequest(ModelState);
 
@@ -79,9 +79,9 @@ namespace Notes.IdentityServer.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -118,8 +118,8 @@ namespace Notes.IdentityServer.Controllers
             return View(model);
         }
 
-        private async Task<bool> SendConfirmationEmail(AppUser user)
-        {
+    private async Task<bool> SendConfirmationEmail(AppUser user)
+    {
             var confirmationToken = 
                 await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -131,9 +131,9 @@ namespace Notes.IdentityServer.Controllers
                 user.Email, callbackUrl);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Logout(string logoutId)
-        {
+    [HttpGet]
+    public async Task<IActionResult> Logout(string logoutId)
+    {
             await _signInManager.SignOutAsync();
             var logoutRequest = await _interactionService.
                 GetLogoutContextAsync(logoutId);
@@ -158,10 +158,10 @@ namespace Notes.IdentityServer.Controllers
 
         
 
-        [HttpPost]
-        public async Task<IActionResult> RequestPasswordResetEmail(
-            PasswordResetQueryViewModel model)
-        {
+    [HttpPost]
+    public async Task<IActionResult> RequestPasswordResetEmail(
+        PasswordResetQueryViewModel model)
+    {
             var loginVm = new LoginViewModel
             {
                 Email = model.Email,
@@ -199,11 +199,11 @@ namespace Notes.IdentityServer.Controllers
             return View("Login", (loginVm, model));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ResetPassword(
-            [EmailAddress] string email,
-            [Required] string passwordResetToken)
-        {
+    [HttpGet]
+    public async Task<IActionResult> ResetPassword(
+        [EmailAddress] string email,
+        [Required] string passwordResetToken)
+    {
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("Ошибка",
@@ -238,9 +238,9 @@ namespace Notes.IdentityServer.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
+    [HttpPost]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -267,8 +267,8 @@ namespace Notes.IdentityServer.Controllers
             return Ok("Новый пароль установлен.");
         }
 
-        private async Task<bool> SendPasswordResetEmail(AppUser user)
-        {
+    private async Task<bool> SendPasswordResetEmail(AppUser user)
+    {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             var callbackUrl = Url.Action("ResetPassword", "Auth",
@@ -277,5 +277,4 @@ namespace Notes.IdentityServer.Controllers
 
             return await _emailService.SendPasswordResetEmailAsync(user.Email, callbackUrl);
         }
-    }
 }

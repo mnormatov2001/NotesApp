@@ -1,13 +1,12 @@
 ﻿using FluentValidation;
 
-namespace Notes.Application.Notes.Queries.GetNote
+namespace Notes.Application.Notes.Queries.GetNote;
+
+public class GetNoteQueryValidator : AbstractValidator<GetNoteQuery>
 {
-    public class GetNoteQueryValidator : AbstractValidator<GetNoteQuery>
+    public GetNoteQueryValidator()
     {
-        public GetNoteQueryValidator()
-        {
             RuleFor(cmd => cmd.UserId).NotEqual(Guid.Empty);
             RuleFor(cmd => cmd.Id).NotEqual(Guid.Empty);
         }
-    }
 }

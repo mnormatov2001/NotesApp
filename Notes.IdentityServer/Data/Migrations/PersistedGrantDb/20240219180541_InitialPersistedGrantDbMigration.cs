@@ -3,14 +3,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Notes.IdentityServer.Data.Migrations.PersistedGrantDb
+namespace Notes.IdentityServer.Data.Migrations.PersistedGrantDb;
+
+/// <inheritdoc />
+public partial class InitialPersistedGrantDbMigration : Migration
 {
     /// <inheritdoc />
-    public partial class InitialPersistedGrantDbMigration : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
             migrationBuilder.CreateTable(
                 name: "DeviceCodes",
                 columns: table => new
@@ -77,14 +77,13 @@ namespace Notes.IdentityServer.Data.Migrations.PersistedGrantDb
                 columns: new[] { "SubjectId", "SessionId", "Type" });
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
             migrationBuilder.DropTable(
                 name: "DeviceCodes");
 
             migrationBuilder.DropTable(
                 name: "PersistedGrants");
         }
-    }
 }

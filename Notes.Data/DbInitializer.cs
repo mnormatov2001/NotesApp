@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Notes.Data
+namespace Notes.Data;
+
+public class DbInitializer
 {
-    public class DbInitializer
+    public static void Initialize(NotesDbContext context)
     {
-        public static void Initialize(NotesDbContext context)
-        {
-            context.Database.Migrate();
-        }
+        context.Database.Migrate();
     }
 }

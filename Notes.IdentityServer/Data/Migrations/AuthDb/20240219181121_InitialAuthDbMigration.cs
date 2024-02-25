@@ -4,14 +4,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Notes.IdentityServer.Data.Migrations.AuthDb
+namespace Notes.IdentityServer.Data.Migrations.AuthDb;
+
+/// <inheritdoc />
+public partial class InitialAuthDbMigration : Migration
 {
     /// <inheritdoc />
-    public partial class InitialAuthDbMigration : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
@@ -197,9 +197,9 @@ namespace Notes.IdentityServer.Data.Migrations.AuthDb
                 unique: true);
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
             migrationBuilder.DropTable(
                 name: "RoleClaims");
 
@@ -221,5 +221,4 @@ namespace Notes.IdentityServer.Data.Migrations.AuthDb
             migrationBuilder.DropTable(
                 name: "Users");
         }
-    }
 }

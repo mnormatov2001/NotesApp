@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
 
-namespace Notes.Application.Notes.Queries.GetPublicNote
+namespace Notes.Application.Notes.Queries.GetPublicNote;
+
+public class GetPublicNoteQueryValidator: AbstractValidator<GetPublicNoteQuery>
 {
-    public class GetPublicNoteQueryValidator: AbstractValidator<GetPublicNoteQuery>
+    public GetPublicNoteQueryValidator()
     {
-        public GetPublicNoteQueryValidator()
-        {
             RuleFor(query => query.Id).NotEqual(Guid.Empty);
         }
-    }
 }

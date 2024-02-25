@@ -3,15 +3,15 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Notes.IdentityServer.Models;
 
-namespace Notes.IdentityServer.Data
-{
-    public class AuthDbContext : IdentityDbContext<AppUser>
-    {
-        public AuthDbContext(DbContextOptions<AuthDbContext> options) 
-            : base(options) { }
+namespace Notes.IdentityServer.Data;
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
+public class AuthDbContext : IdentityDbContext<AppUser>
+{
+    public AuthDbContext(DbContextOptions<AuthDbContext> options) 
+        : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
             base.OnModelCreating(builder);
             builder.Entity<AppUser>().HasKey(x => x.Id);
             builder.Entity<AppUser>(entity => entity.ToTable("Users"));
@@ -22,5 +22,4 @@ namespace Notes.IdentityServer.Data
             builder.Entity<IdentityUserLogin<string>>(entity => entity.ToTable("UserLogins"));
             builder.Entity<IdentityRoleClaim<string>>(entity => entity.ToTable("RoleClaims"));
         }
-    }
 }

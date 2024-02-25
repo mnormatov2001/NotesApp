@@ -1,10 +1,9 @@
 ﻿using MediatR;
 
-namespace Notes.Application.Notes.Commands.RestoreNote
+namespace Notes.Application.Notes.Commands.RestoreNote;
+
+public class RestoreNoteCommand: IRequest<Guid>
 {
-    public class RestoreNoteCommand: IRequest<Guid>
-    {
-        public Guid UserId { get; set; }
-        public Guid Id { get; set; }
-    }
+    public Guid UserId { get; set; }
+    public Guid Id { get; set; }
 }

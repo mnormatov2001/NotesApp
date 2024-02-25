@@ -3,21 +3,21 @@ using MimeKit;
 using MimeKit.Text;
 using Notes.IdentityServer.Services.Interfaces;
 
-namespace Notes.IdentityServer.Services
-{
-    public class MailKitEmailSender : IEmailSender
-    {
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<MailKitEmailSender> _logger;
+namespace Notes.IdentityServer.Services;
 
-        public MailKitEmailSender(IConfiguration configuration, ILogger<MailKitEmailSender> logger)
-        {
+public class MailKitEmailSender : IEmailSender
+{
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<MailKitEmailSender> _logger;
+
+    public MailKitEmailSender(IConfiguration configuration, ILogger<MailKitEmailSender> logger)
+    {
             _configuration = configuration;
             _logger = logger;
         }
 
-        public async Task<bool> SendEmailAsync(string emailAddress, string subject, string message)
-        {
+    public async Task<bool> SendEmailAsync(string emailAddress, string subject, string message)
+    {
             var senderUsername = _configuration["SmtpClient:Username"];
             var senderPassword = _configuration["SmtpClient:Password"];
             var host = _configuration["SmtpClient:Host"];
@@ -46,5 +46,4 @@ namespace Notes.IdentityServer.Services
 
             return true;
         }
-    }
 }

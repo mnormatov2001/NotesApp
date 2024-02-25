@@ -2,25 +2,25 @@
 using Notes.Application.Common.Mappings;
 using Notes.Domain;
 
-namespace Notes.Application.Notes.DTOs
+namespace Notes.Application.Notes.DTOs;
+
+public class NoteVm : IMapWith<Note>
 {
-    public class NoteVm : IMapWith<Note>
-    {
 #pragma warning disable CS8618
 
-        public Guid Id { get; set; }
-        public Guid ParentNoteId { get; set; }
-        public string Title { get; set; }
-        public string? Content { get; set; }
-        public DateTime CreationDate { get; set; }
-        public DateTime EditDate { get; set; }
-        public string? Icon { get; set; }
-        public string? CoverImage { get; set; }
-        public bool IsArchived { get; set; }
-        public bool IsPublished { get; set; }
+    public Guid Id { get; set; }
+    public Guid ParentNoteId { get; set; }
+    public string Title { get; set; }
+    public string? Content { get; set; }
+    public DateTime CreationDate { get; set; }
+    public DateTime EditDate { get; set; }
+    public string? Icon { get; set; }
+    public string? CoverImage { get; set; }
+    public bool IsArchived { get; set; }
+    public bool IsPublished { get; set; }
 
-        public void Mapping(Profile profile)
-        {
+    public void Mapping(Profile profile)
+    {
             profile.CreateMap<Note, NoteVm>()
                 .ForMember(noteVm => noteVm.Id,
                     opt => opt.MapFrom(note => note.Id))
@@ -43,5 +43,4 @@ namespace Notes.Application.Notes.DTOs
                 .ForMember(noteVm => noteVm.ParentNoteId,
                     opt => opt.MapFrom(note => note.ParentNoteId));
         }
-    }
 }

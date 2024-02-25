@@ -3,17 +3,17 @@ using System.Text.Json;
 using FluentValidation;
 using Notes.Application.Common.Exceptions;
 
-namespace Notes.WebApi.Middleware
+namespace Notes.WebApi.Middleware;
+
+public class CustomExceptionHandlerMiddleware
 {
-    public class CustomExceptionHandlerMiddleware
+    private readonly RequestDelegate _next;
+
+    public CustomExceptionHandlerMiddleware(RequestDelegate next) => 
+        _next = next;
+
+    public async Task Invoke(HttpContext context)
     {
-        private readonly RequestDelegate _next;
-
-        public CustomExceptionHandlerMiddleware(RequestDelegate next) => 
-            _next = next;
-
-        public async Task Invoke(HttpContext context)
-        {
             try
             {
                 await _next(context);
@@ -24,8 +24,8 @@ namespace Notes.WebApi.Middleware
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
+    private Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
             var code = HttpStatusCode.InternalServerError;
             var result = string.Empty;
             switch (exception)
@@ -47,5 +47,4 @@ namespace Notes.WebApi.Middleware
 
             return context.Response.WriteAsync(result);
         }
-    }
 }
