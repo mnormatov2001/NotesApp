@@ -25,7 +25,7 @@ public class MailKitEmailSender : IEmailSender
         var useSsl = _configuration.GetRequiredSection("SmtpClient").GetValue<bool>("UseSsl");
 
         using var emailMessage = new MimeMessage();
-        emailMessage.From.Add(new MailboxAddress("Notes.App", senderUsername));
+        emailMessage.From.Add(new MailboxAddress("NoteXpress", senderUsername));
         emailMessage.To.Add(new MailboxAddress("", emailAddress));
         emailMessage.Subject = subject;
         emailMessage.Body = new TextPart(TextFormat.Html) { Text = message };
