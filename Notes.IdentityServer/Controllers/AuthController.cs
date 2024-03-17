@@ -13,25 +13,33 @@ public class AuthController : Controller
     private readonly UserManager<AppUser> _userManager;
     private readonly IIdentityServerInteractionService _interactionService;
     private readonly EmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     public AuthController(SignInManager<AppUser> signInManager,
         UserManager<AppUser> userManager,
         IIdentityServerInteractionService interactionService,
-        EmailService emailService)
+        EmailService emailService,
+        IConfiguration configuration)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _interactionService = interactionService;
         _emailService = emailService;
+        _configuration = configuration;
     }
 
     [HttpGet]
     public IActionResult Login([Url] string returnUrl)
     {
-        if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
-            return BadRequest(ModelState);
+        var model = new LoginViewModel { ReturnUrl = returnUrl };
+        if (!ModelState.IsValid)
+        {
+            if (!Url.IsLocalUrl(returnUrl))
+                model.ReturnUrl = _configuration["DefaultReturnUrl"];
+            ModelState.Clear();
+        }
 
-        return View(new LoginViewModel { ReturnUrl = returnUrl });
+        return View(model);
     }
 
     [HttpPost]
@@ -65,10 +73,14 @@ public class AuthController : Controller
     [HttpGet]
     public IActionResult Register([Url] string returnUrl)
     {
-        if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
-            return BadRequest(ModelState);
-
         var model = new RegisterViewModel { ReturnUrl = returnUrl };
+        if (!ModelState.IsValid)
+        {
+            if (!Url.IsLocalUrl(returnUrl))
+                model.ReturnUrl = _configuration["DefaultReturnUrl"];
+            ModelState.Clear();
+        }
+
         return View(model);
     }
 
@@ -151,10 +163,15 @@ public class AuthController : Controller
     [HttpGet]
     public IActionResult RequestPasswordResetEmail([Url] string returnUrl)
     {
-        if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
-            return BadRequest(ModelState);
+        var model = new PasswordResetQueryViewModel { ReturnUrl = returnUrl };
+        if (!ModelState.IsValid)
+        {
+            if (!Url.IsLocalUrl(returnUrl))
+                model.ReturnUrl = _configuration["DefaultReturnUrl"];
+            ModelState.Clear();
+        }
 
-        return View(new PasswordResetQueryViewModel { ReturnUrl = returnUrl });
+        return View(model);
     }
 
     [HttpPost]
@@ -222,7 +239,8 @@ public class AuthController : Controller
         var model = new ResetPasswordViewModel
         {
             Email = email,
-            PasswordResetToken = passwordResetToken
+            PasswordResetToken = passwordResetToken,
+            ReturnUrl = _configuration["DefaultReturnUrl"]
         };
 
         return View(model);
