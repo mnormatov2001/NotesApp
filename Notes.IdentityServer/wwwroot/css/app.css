@@ -1,84 +1,99 @@
-﻿.form-contaienr {
-    background: #ffffff;
-    padding: 25px 30px;
-    max-width: 300px;
-    margin: 40px auto;
-    border-radius: 5px;
-    box-shadow: 0 4px 10px 4px lightgray;
+﻿
+.inter-font {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
 }
 
-a {
-    text-decoration: none !important;
-    cursor: pointer;
+html,
+body {
+    height: 100%;
+    background-color: #fffefc;
 }
 
-input {
-    height: auto;
-    border: 1px solid #dfdede;
-    border-radius: 3px;
-    padding: 3px 8px;
-}
-
-input:focus {
-    outline: none;
-    border: 2px solid #c1d9fd;
-}
-
-.register-btn {
-    font-weight: bold;
-    font-size: 16px;
-    height: 40px;
-    background: #247fff;
-    border: 0;
-    border-radius: 3px;
-    color: #fff;
-    cursor: pointer;
-    text-align: center;
-}
-
-.register-btn:hover {
-    background-color: #0d6cf2;
-}
-
-.label-text {
-    font-size: 14px;
-    margin-bottom: 3px;
-}
-
-.modal-container {
-    border-radius: 5px;
-    padding: 20px 25px;
-    position: relative;
+.wrapper {
+    min-height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    color: var(--bs-modal-color);
-    pointer-events: auto;
-    background-color: var(--bs-modal-bg);
-    background-clip: padding-box;
-    border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
-    outline: 0;
 }
 
-.my-modal-dialog {
-    max-width: 350px !important;
+.main {
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    -o-flex: 1 1 auto;
+    flex: 1 1 auto;
 }
 
-.my-modal-header {
-    border-bottom: 0 !important;
-    padding: 0 !important;
+input:focus-visible {
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25) !important;
+    outline-offset: 0px !important;
 }
 
-.btn-close:focus {
-    box-shadow: none !important;
+input::placeholder {
+    color: rgb(161, 160, 159) !important;
+    -ms-opacity: 1 !important;
+    opacity: 1 !important;
+    font-size: 14px !important;
+    font-weight: 300 !important;
 }
 
-.modal-footer {
-    padding: 0 !important;
-    border-top: 0 !important;
+a.btn {
+    display: flex;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 14px;
+    font-weight: 500;
+    height: 2.25rem;
+    -ms-align-items: center;
+    -o-align-items: center;
+    -webkit-align-items: center;
+    align-items: center;
 }
 
-.modal-btn {
-    border-radius: 3px !important;
+.my-btn {
+    background: rgb(35, 131, 226) !important;
+    box-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px inset, rgba(15, 15, 15, 0.1) 0px 1px 2px !important;
+    color: white !important;
+    font-weight: 500 !important;
+}
+
+.my-btn:hover,
+.my-btn:active {
+    background: rgb(0, 119, 212) !important;
+    color: white !important;
+}
+
+.my-form {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.my-light-btn {
+    display: flex;
+    white-space: nowrap !important;
+    border: none !important;
+    color: #737373;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    height: 2.25rem;
+    font-size: 14px;
+    font-weight: 500;
+    -ms-align-items: center;
+    -o-align-items: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.my-light-btn:hover,
+.my-light-btn:active {
+    background-color: #f5f5f5 !important;
+    color: #171717;
+    border: none !important;
+}
+
+.text-hover-red:hover {
+    color: #eb5757 !important;
 }

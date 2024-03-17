@@ -31,42 +31,35 @@ public class AuthController : Controller
         if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
             return BadRequest(ModelState);
 
-        var loginVm = new LoginViewModel { ReturnUrl = returnUrl };
-        var passwordResetQueryVm =
-            new PasswordResetQueryViewModel { ReturnUrl = returnUrl };
-        return View((loginVm, passwordResetQueryVm));
+        return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login(LoginViewModel loginVm)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
-        var passwordResetQueryVm = new PasswordResetQueryViewModel
-            { Email = loginVm.Email, ReturnUrl = loginVm.ReturnUrl };
-
         if (!ModelState.IsValid)
         {
-            ViewBag.LoginError = true;
-            return View((loginVm, passwordResetQueryVm));
+            return View(model);
         }
 
-        var user = await _userManager.FindByEmailAsync(loginVm.Email);
+        var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
         {
-            ViewBag.LoginError = true;
-            ViewBag.EmailNotFoundError = true;
-            return View((loginVm, passwordResetQueryVm));
+            ModelState.AddModelError(nameof(Login),
+                "This email address is not registered.");
+            return View(model);
         }
 
         var result = await _signInManager.PasswordSignInAsync(user,
-            loginVm.Password, false, false);
+            model.Password, false, false);
         if (!result.Succeeded)
         {
-            ViewBag.LoginError = true;
-            ViewBag.IncorrectPasswordError = true;
-            return View((loginVm, passwordResetQueryVm));
+            ModelState.AddModelError(nameof(Login),
+                "Incorrect password.");
+            return View(model);
         }
 
-        return Redirect(loginVm.ReturnUrl);
+        return Redirect(model.ReturnUrl);
     }
 
     [HttpGet]
@@ -84,12 +77,12 @@ public class AuthController : Controller
     {
         if (!ModelState.IsValid)
             return View(model);
-
+        
         var existUser = await _userManager.FindByEmailAsync(model.Email);
         if (existUser != null)
         {
-            ViewBag.RegistrationError = true;
-            ViewBag.BusyEmailError = true;
+            ModelState.AddModelError(nameof(Register),
+                "A user with this email already exists.");
             return View(model);
         }
 
@@ -106,9 +99,9 @@ public class AuthController : Controller
         if (!result.Succeeded)
         {
             foreach (var error in result.Errors)
-                ModelState.AddModelError(error.Code, error.Description);
+                ModelState.AddModelError($"{nameof(Register)}-{error.Code}",
+                    error.Description);
 
-            ViewBag.RegistrationError = true;
             return View(model);
         }
 
@@ -152,48 +145,48 @@ public class AuthController : Controller
         if (logoutRequest?.SignOutIFrameUrl != null)
             return Redirect(logoutRequest.SignOutIFrameUrl);
 
-        return Ok("Выход выполнен успешно.");
+        return Ok("Logout completed successfully.");
+    }
+
+    [HttpGet]
+    public IActionResult RequestPasswordResetEmail([Url] string returnUrl)
+    {
+        if (!ModelState.IsValid && !Url.IsLocalUrl(returnUrl))
+            return BadRequest(ModelState);
+
+        return View(new PasswordResetQueryViewModel { ReturnUrl = returnUrl });
     }
 
     [HttpPost]
     public async Task<IActionResult> RequestPasswordResetEmail(
         PasswordResetQueryViewModel model)
     {
-        var loginVm = new LoginViewModel
-        {
-            Email = model.Email,
-            ReturnUrl = model.ReturnUrl,
-        };
-
         if (!ModelState.IsValid)
-        {
-            ViewBag.CanNotResetPasswordError = true;
-            return View("Login", (loginVm, model));
-        }
+            return View(model);
 
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
         {
-            ViewBag.CanNotResetPasswordError = true;
-            ViewBag.EmailNotFoundError = true;
-            return View("Login", (loginVm, model));
+            ModelState.AddModelError(nameof(RequestPasswordResetEmail),
+                "This email address is not registered.");
+            return View(model);
         }
 
         if (!user.EmailConfirmed)
         {
-            ViewBag.CanNotResetPasswordError = true;
-            ViewBag.EmailNotConfirmedError = true;
-            return View("Login", (loginVm, model));
+            ModelState.AddModelError(nameof(RequestPasswordResetEmail),
+                "This email address is not confirmed.");
+            return View(model);
         }
 
         var success = await SendPasswordResetEmail(user);
         if (!success)
         {
-            ViewBag.CanNotResetPasswordError = true;
-            ViewBag.SendingEmailError = true;
+            ModelState.AddModelError(nameof(RequestPasswordResetEmail),
+                "Failed to send email, please try later.");
         }
 
-        return View("Login", (loginVm, model));
+        return View(model);
     }
 
     [HttpGet]
@@ -203,16 +196,16 @@ public class AuthController : Controller
     {
         if (!ModelState.IsValid)
         {
-            ModelState.AddModelError("Ошибка",
-                "Неверная ссылка для сброса пароля.");
+            ModelState.AddModelError(nameof(ResetPassword),
+                "Invalid password reset link.");
             return BadRequest(ModelState);
         }
 
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            ModelState.AddModelError("Ошибка",
-                "Неверная ссылка для сброса пароля.");
+            ModelState.AddModelError(nameof(ResetPassword),
+                "Invalid password reset link.");
             return BadRequest(ModelState);
         }
 
@@ -221,8 +214,8 @@ public class AuthController : Controller
             UserManager<AppUser>.ResetPasswordTokenPurpose, passwordResetToken);
         if (!okay)
         {
-            ModelState.AddModelError("Ошибка",
-                "Неверная ссылка для сброса пароля.");
+            ModelState.AddModelError(nameof(ResetPassword),
+                "Invalid password reset link.");
             return BadRequest(ModelState);
         }
 
@@ -244,8 +237,8 @@ public class AuthController : Controller
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
         {
-            ModelState.AddModelError("Ошибка",
-                "Неверная ссылка для сброса пароля.");
+            ModelState.AddModelError(nameof(ResetPassword),
+                "Invalid password reset link.");
             return BadRequest(ModelState);
         }
 
@@ -254,14 +247,13 @@ public class AuthController : Controller
         if (!result.Succeeded)
         {
             foreach (var error in result.Errors)
-                ModelState.AddModelError(error.Code, error.Description);
+                ModelState.AddModelError($"{nameof(ResetPassword)}-{error.Code}",
+                    error.Description);
 
-            ModelState.AddModelError("Ошибка",
-                "Неверная ссылка для сброса пароля.");
-            return BadRequest(ModelState);
+            return View(model);
         }
 
-        return Ok("Новый пароль установлен.");
+        return Ok("The new password has been set.");
     }
 
     private async Task<bool> SendPasswordResetEmail(AppUser user)

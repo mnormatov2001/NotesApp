@@ -13,9 +13,9 @@ public class EmailService
     public async Task<bool> SendAccountConfirmationEmailAsync(
         [EmailAddress] string sendTo, [Url] string callbackUrl)
     {
-        var subject = "Подтверждение аккаунта NotesApp";
-        var message = "Добро пожаловать в NotesApp!\n" +
-                      "Подтвердите регистрацию, перейдя по ссылке: " +
+        var subject = "Confirm your NoteXpress email address";
+        var message = "Welcome to NoteXpress!\n" +
+                      "Confirm your registration by following the link: " +
                       $"<a href=\"{callbackUrl}\">{callbackUrl}</a>";
 
         return await _emailSender.SendEmailAsync(sendTo, subject, message);
@@ -24,8 +24,8 @@ public class EmailService
     public async Task<bool> SendPasswordResetEmailAsync(
         [EmailAddress] string sendTo, [Url] string callbackUrl)
     {
-        var subject = "Сброс пароля аккаунта NotesApp";
-        var message = "Для сброса пароля перейдите по ссылке: " +
+        var subject = "Resetting NoteXpress account password";
+        var message = "To reset your password, follow the link: " +
                       $"<a href=\"{callbackUrl}\">{callbackUrl}</a>";
 
         return await _emailSender.SendEmailAsync(sendTo, subject, message);

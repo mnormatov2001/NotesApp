@@ -1,120 +1,123 @@
 ﻿@model RegisterViewModel
 
-<!DOCTYPE html>
+@{
+    ViewBag.Title = "Sign up";
+}
 
-<html>
-
-<head>
-  <link href=@Url.Content("~/css/app.css") rel="stylesheet" type="text/css"/>
-  <link href=@Url.Content("~/css/bootstrap.css") rel="stylesheet" type="text/css"/>
-</head>
-
-<body>
-
-<div class="container">
-  <div class="row justify-content-center align-items-center">
-    <div class="col-xl-4 col-md-6 col-sm-12">
-      <div class="form-contaienr">
-        <table width="100%" class="mb-2">
-          <tr>
-            <td align="left">
-              <h5>Регистрация</h5>
-            </td>
-            <td align="right">
-              <h5>
-                <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">Вход</a>
-              </h5>
-            </td>
-          </tr>
-        </table>
-        <form asp-controller="Auth" asp-action="Register" method="post">
-          <div>
-            <input asp-for="@Model.ReturnUrl" type="hidden"/>
-            <label class="text-secondary label-text">Имя</label>
-            <input class="w-100" type="text" asp-for="@Model.FirstName">
-            <span class="text-danger label-text" asp-validation-for="@Model.FirstName"></span>
-            <label class="mt-2 text-secondary label-text">Фамилия</label>
-            <input class="w-100" type="text" asp-for="@Model.LastName">
-            <span class="text-danger label-text" asp-validation-for="@Model.LastName"></span>
-            <label class="mt-2 text-secondary label-text">Адрес электронной почты</label>
-            <input class="w-100" type="email" asp-for="@Model.Email">
-            <span class="text-danger label-text" asp-validation-for="@Model.Email"></span>
-            
-            @if (ViewData.ContainsKey("RegistrationError") && ViewBag.RegistrationError == true)
-            {
-              @if (ViewData.ContainsKey("BusyEmailError") && ViewBag.BusyEmailError == true)
-              {
-                <label class="text-danger label-text">*Пользователь с таким email уже существует.</label>
-              }
-              else
-              {
-                <label class="text-danger label-text">*Ошибка регистрации.</label>
-              }
+<!-- Header -->
+<header>
+    <nav class="navbar navbar-light p-4 ">
+        <div class="container-fluid p-0">
+            @{
+                await Html.RenderPartialAsync("Brand");
+                await Html.RenderPartialAsync("LoginLink", (Model.ReturnUrl, true));
             }
-            
-            <label class="mt-2 text-secondary label-text">Пароль</label>
-            <input class="w-100" type="password" asp-for="@Model.Password">
-            <span class="text-danger label-text" asp-validation-for="@Model.Password"></span>
-            <label class="mt-2 text-secondary label-text">Подтверждение пароля</label>
-            <input class="w-100" type="password" asp-for="@Model.ConfirmPassword">
-            <span class="text-danger label-text" asp-validation-for="@Model.ConfirmPassword"></span>
-          </div>
-          <button class="mt-4 w-100 register-btn" type="submit">Зарегистрироваться</button>
-        </form>
-      </div>
-      
-      @*Modal*@
-      <div class="modal fade" id="RegistrationSuccessModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-container">
-           
-            <div class="col-12">
-              <h6>Вы успешно зарегистрировались.</h6>
-
-              @if (ViewData.ContainsKey("ConfirmationEmailSent"))
-              {
-                if (ViewBag.ConfirmationEmailSent == true)
-                {
-                  <p>Письмо подтверждения отправлено на почту @Model.Email</p>
-                }
-                else
-                {
-                  <p>Письмо подтверждения не было отправлено из-за ошибки на сервере. Запросите письмо подтверждения в личном кабинете позднее</p>
-                }
-              }
-            
-              <div class="float-end align-self-end">
-                <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" 
-                   class="btn btn-primary modal-btn">Ok</a>
-              </div>
-            </div>
-
-          </div>
         </div>
-      </div>
-      @*End Modal*@
-
+    </nav>
+</header>
+<!-- End Header -->
+<!-- Main -->
+<main class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="text-center mb-4"
+                    style="font-size: 50px; font-weight: 700">
+                    Sign up
+                </h1>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <form asp-controller="Auth" asp-action="Register" method="post"
+                      class="my-form">
+                    <input asp-for="ReturnUrl" type="hidden" />
+                    <div class="form-group mb-2">
+                        <label class="mb-1 text-black-50" style="font-size: smaller;">First name</label>
+                        <input asp-for="FirstName"
+                               type="text"
+                               class="form-control py-1"
+                               aria-describedby="emailHelp"
+                               placeholder="First name" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="mb-1 text-black-50" style="font-size: smaller;">Last name</label>
+                        <input asp-for="LastName"
+                               type="text"
+                               class="form-control py-1"
+                               aria-describedby="emailHelp"
+                               placeholder="Last name" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="mb-1 text-black-50" style="font-size: smaller;">Email</label>
+                        <input asp-for="Email"
+                               type="email"
+                               class="form-control py-1"
+                               aria-describedby="emailHelp"
+                               placeholder="example@gmail.com" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="mb-1 text-black-50" style="font-size: smaller;">Password</label>
+                        <input asp-for="Password"
+                               type="password"
+                               class="form-control py-1"
+                               placeholder="password" />
+                    </div>
+                    <div class="form-group">
+                        <label class="mb-1 text-black-50" style="font-size: smaller;">Confirm password</label>
+                        <input asp-for="ConfirmPassword"
+                               type="password"
+                               class="form-control py-1"
+                               placeholder="password" />
+                    </div>
+                    <button type="submit" class="btn w-100 rounded-1 mt-4 my-btn">Continue</button>
+                    <div class="text-danger mt-3" asp-validation-summary="All"></div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
+</main>
+<!-- End Main -->
+<!-- RegistrationSuccessModal -->
+<div class="modal fade" id="RegistrationSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+          <div class="modal-content p-3">
+            <div class="col-12">
+                <h6>You have successfully signed up.</h6>
+
+                @if (ViewData.ContainsKey("ConfirmationEmailSent"))
+                {
+                    if (ViewBag.ConfirmationEmailSent == true)
+                    {
+                        <p>Confirmation email sent to @Model.Email</p>
+                    }
+                    else
+                    {
+                        <p>The confirmation email was not sent due to a server error. Confirm your email address in your personal account later</p>
+                    }
+                }
+            
+                <div class="float-end align-self-end">
+                    <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" 
+                       class="btn btn-dark modal-btn">Ok</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<script src=@Url.Content("~/js/bootstrap.bundle.js")></script>
+<!-- End RegistrationSuccessModal -->
+<!-- RegistrationSuccessModal Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-  $(document).ready(function() {
-    function openModalDialog() {
-      window.$("#RegistrationSuccessModal").modal("show");
-    }
+    $(document).ready(function() {
+        function openModalDialog() {
+            window.$("#RegistrationSuccessModal").modal("show");
+        }
 
-    @if (ViewData.ContainsKey("RegistrationSuccess") && ViewBag.RegistrationSuccess == true)
-    {
-      @:openModalDialog();
-    }
-  });
+        @if (ViewData.ContainsKey("RegistrationSuccess") && ViewBag.RegistrationSuccess == true)
+        {
+            @:openModalDialog();
+        }
+    });
 </script>
-
-</body>
-
-
-</html>
+<!-- End RegistrationSuccessModal Script -->
