@@ -116,6 +116,7 @@ using (var scope = app.Services.CreateScope())
     {
         var logger = provider.GetRequiredService<ILogger<Program>>();
         logger.LogError(e, "An error occurred while app initialization");
+        return;
     }
 }
 
