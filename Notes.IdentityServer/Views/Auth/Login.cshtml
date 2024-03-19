@@ -1,0 +1,60 @@
+﻿@model LoginViewModel
+
+@{
+    ViewBag.Title = "Log in";
+}
+
+<!-- Header -->
+<header>
+    <nav class="navbar navbar-light p-4 ">
+        <div class="container-fluid p-0">
+            @{
+                await Html.RenderPartialAsync("Brand");
+                await Html.RenderPartialAsync("RegisterLink", Model.ReturnUrl);
+            }
+        </div>
+    </nav>
+</header>
+<!-- End Header -->
+<!-- Main -->
+<main class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="text-center mt-5 mb-5"
+                    style="font-size: 50px; font-weight: 700">
+                    Log in
+                </h1>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <form asp-controller="Auth" asp-action="Login" method="post"
+                      class="my-form">
+                    <input asp-for="ReturnUrl" type="hidden" />
+                    <div class="form-group mb-2">
+                        <label class="mb-1 text-black-50" style="font-size: smaller;">Email</label>
+                        <input asp-for="Email"
+                               type="email"
+                               class="form-control py-1"
+                               aria-describedby="emailHelp"
+                               placeholder="Enter your email address..." />
+                    </div>
+                    <div class="form-group">
+                        <label class="mb-1 text-black-50" style="font-size: smaller;">Password</label>
+                        <input asp-for="Password"
+                               type="password"
+                               class="form-control py-1"
+                               placeholder="Enter your password..." />
+                    </div>
+                    <button type="submit" class="btn w-100 rounded-1 mt-3 my-btn">Continue</button>
+                    <a asp-controller="Auth" asp-action="RequestPasswordResetEmail" asp-route-returnUrl="@Model.ReturnUrl"
+                       class="text-center d-block mt-3 text-black-50 text-hover-red fw-normal" style="font-size: 14px;">Forgot password?</a>
+                    <div class="text-danger mt-3" asp-validation-summary="All"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- End Main -->
+      

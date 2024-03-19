@@ -1,0 +1,12 @@
+﻿@model (string ReturnUrl, bool Dark)
+
+@if (Model.Dark)
+{
+    <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl"
+       class="btn ms-auto me-2 btn-dark">Log in</a>
+}
+else
+{
+    <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl"
+       class="btn ms-auto me-2 my-light-btn text-black">Log in</a>
+}

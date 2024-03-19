@@ -1,0 +1,99 @@
+﻿
+.inter-font {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
+}
+
+html,
+body {
+    height: 100%;
+    background-color: #fffefc;
+}
+
+.wrapper {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    -o-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+input:focus-visible {
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25) !important;
+    outline-offset: 0px !important;
+}
+
+input::placeholder {
+    color: rgb(161, 160, 159) !important;
+    -ms-opacity: 1 !important;
+    opacity: 1 !important;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+}
+
+a.btn {
+    display: flex;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 14px;
+    font-weight: 500;
+    height: 2.25rem;
+    -ms-align-items: center;
+    -o-align-items: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.my-btn {
+    background: rgb(35, 131, 226) !important;
+    box-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px inset, rgba(15, 15, 15, 0.1) 0px 1px 2px !important;
+    color: white !important;
+    font-weight: 500 !important;
+}
+
+.my-btn:hover,
+.my-btn:active {
+    background: rgb(0, 119, 212) !important;
+    color: white !important;
+}
+
+.my-form {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.my-light-btn {
+    display: flex;
+    white-space: nowrap !important;
+    border: none !important;
+    color: #737373;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    height: 2.25rem;
+    font-size: 14px;
+    font-weight: 500;
+    -ms-align-items: center;
+    -o-align-items: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.my-light-btn:hover,
+.my-light-btn:active {
+    background-color: #f5f5f5 !important;
+    color: #171717;
+    border: none !important;
+}
+
+.text-hover-red:hover {
+    color: #eb5757 !important;
+}
