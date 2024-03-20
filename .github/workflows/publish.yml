@@ -2,9 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
+    branches: [ "master" ]
 
 jobs:
 
@@ -78,7 +76,8 @@ jobs:
         platforms: linux/amd64
         push: true
         tags: |
-          mnormatov2001/notes-api-dev:latest
+          mnormatov2001/notes-api:latest
+          mnormatov2001/notes-api:${{ github.sha }}
         
 
   identity_server:
@@ -119,4 +118,5 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          mnormatov2001/notes-identity-server-dev:latest
+          mnormatov2001/notes-identity-server:latest
+          mnormatov2001/notes-identity-server:${{ github.sha }}
