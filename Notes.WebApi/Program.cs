@@ -7,7 +7,21 @@ using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Notes.WebApi.Middleware;
+using Serilog;
+using Notes.WebApi.Services;
+using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Extensions;
 
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.WithExceptionDetails()
+    .Enrich.WithClientIp()
+    .Enrich.WithRequestQuery()
+    .MinimumLevel.Information()
+    .WriteTo.Async(configure => configure.Console(LogEventLevel.Information,
+        "[{Timestamp:HH:mm:ss.fff zzz}][{Level:u3}] {SourceContext}{NewLine}" +
+        "{Message:lj}{NewLine}{Exception}{NewLine}")).CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +32,9 @@ builder.Services
         config.AddProfile(new AssemblyMappingProfile(typeof(INotesDbContext).Assembly));
     });
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplication();
+builder.Services.AddSingleton<ICurrentUserService, CurrentUserService>();
 builder.Services.AddDataBase(builder.Configuration);
 builder.Services.AddControllers();
 
@@ -77,11 +93,15 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
+app.UseSerilogRequestLogging();
 app.UseSwagger();
 app.UseSwaggerUI(config =>
 {
@@ -110,8 +130,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception e)
     {
-        var logger = provider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(e, "An error occurred while app initialization");
+        Log.Fatal(e, "An error occurred while app initialization.");
         return;
     }
 }

@@ -41,7 +41,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("{id:guid}")]
     [Authorize]
-    public async Task<ActionResult<NoteVm>> GetNote(Guid id)
+    public async Task<ActionResult<NoteVm>> Get(Guid id)
     {
         var query = new GetNoteQuery
         {
@@ -68,7 +68,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpDelete("{id:guid}")]
     [Authorize]
-    public async Task<ActionResult<Guid>> DeleteNote(Guid id)
+    public async Task<ActionResult<Guid>> Delete(Guid id)
     {
         var cmd = new DeleteNoteCommand
         {
@@ -81,7 +81,7 @@ public class NotesController : BaseApiController
     }
 
     /// <summary>
-    /// Archives the note
+    /// Archives the note and all its children recursively
     /// </summary>
     /// <param name="id">Note id (guid)</param>
     /// <returns>Returns archived note id (guid)</returns>
@@ -95,7 +95,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpPut("archive")]
     [Authorize]
-    public async Task<ActionResult<Guid>> ArchiveNote(Guid id)
+    public async Task<ActionResult<Guid>> Archive(Guid id)
     {
         var cmd = new ArchiveNoteCommand
         {
@@ -108,7 +108,8 @@ public class NotesController : BaseApiController
     }
 
     /// <summary>
-    /// Restores the note
+    /// Restores the note and all its children recursively.
+    /// If its parent is archived, then it will become a note without a parent
     /// </summary>
     /// <param name="id">Note id (guid)</param>
     /// <returns>Returns restored note id (guid)</returns>
@@ -122,7 +123,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpPut("restore")]
     [Authorize]
-    public async Task<ActionResult<Guid>> RestoreNote(Guid id)
+    public async Task<ActionResult<Guid>> Restore(Guid id)
     {
         var cmd = new RestoreNoteCommand
         {
@@ -149,7 +150,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpPut("update")]
     [Authorize]
-    public async Task<ActionResult<Guid>> UpdateNote([FromBody] UpdateNoteDto updateNoteDto)
+    public async Task<ActionResult<Guid>> Update([FromBody] UpdateNoteDto updateNoteDto)
     {
         var cmd = _mapper.Map<UpdateNoteCommand>(updateNoteDto);
         cmd.UserId = UserId;
@@ -170,7 +171,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpPost("create")]
     [Authorize]
-    public async Task<ActionResult<Guid>> CreateNote([FromBody] CreateNoteDto createNoteDto)
+    public async Task<ActionResult<Guid>> Create([FromBody] CreateNoteDto createNoteDto)
     {
         var cmd = _mapper.Map<CreateNoteCommand>(createNoteDto);
         cmd.UserId = UserId;
@@ -191,7 +192,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("children/count")]
     [Authorize]
-    public async Task<ActionResult<int>> GetChildNotesCount(Guid parentNoteId)
+    public async Task<ActionResult<int>> ChildCount(Guid parentNoteId)
     {
         var query = new GetNotesCountQuery
         {
@@ -215,7 +216,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("children")]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<NoteVm>>> GetChildrenNotes(Guid parentNoteId)
+    public async Task<ActionResult<IEnumerable<NoteVm>>> GetChildren(Guid parentNoteId)
     {
         var query = new GetNotesQuery
         {
@@ -238,7 +239,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("all")]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<NoteVm>>> GetAllNotes()
+    public async Task<ActionResult<IEnumerable<NoteVm>>> GetAll()
     {
         var query = new GetAllNotesQuery()
         {
@@ -260,7 +261,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("trash")]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<NoteVm>>> GetNotesTrash()
+    public async Task<ActionResult<IEnumerable<NoteVm>>> GetTrash()
     {
         var query = new GetNotesTrashQuery
         {
@@ -283,7 +284,7 @@ public class NotesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("public/{id:guid}")]
-    public async Task<ActionResult<NoteVm>> GetPublicNote(Guid id)
+    public async Task<ActionResult<NoteVm>> GetPublic(Guid id)
     {
         var query = new GetPublicNoteQuery
         {
