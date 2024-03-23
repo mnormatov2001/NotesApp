@@ -9,7 +9,19 @@ using Microsoft.OpenApi.Models;
 using Notes.WebApi.Middleware;
 using Serilog;
 using Notes.WebApi.Services;
+using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Extensions;
 
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.WithExceptionDetails()
+    .Enrich.WithClientIp()
+    .Enrich.WithRequestQuery()
+    .MinimumLevel.Information()
+    .WriteTo.Async(configure => configure.Console(LogEventLevel.Information,
+        "[{Timestamp:HH:mm:ss.fff zzz}][{Level:u3}] {SourceContext}{NewLine}" +
+        "{Message:lj}{NewLine}{Exception}{NewLine}")).CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,8 +93,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Host.UseSerilog((context, configuration) => configuration
-    .ReadFrom.Configuration(context.Configuration));
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
 var app = builder.Build();
 
