@@ -115,7 +115,7 @@ jobs:
           LOCALHOST_ROOT_CA_CRT
           LOCALHOST_ROOT_CA_KEY
           LOCALHOST_ROOT_CA_PASSWORD
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         push: true
         tags: |
           mnormatov2001/notes-identity-server:latest

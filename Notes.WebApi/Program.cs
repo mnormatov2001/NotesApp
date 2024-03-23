@@ -131,6 +131,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception e)
     {
         Log.Fatal(e, "An error occurred while app initialization.");
+        await Task.Delay(100);
         return;
     }
 }
