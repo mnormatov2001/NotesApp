@@ -6,8 +6,21 @@ using Notes.IdentityServer.Data;
 using Notes.IdentityServer.Models;
 using Notes.IdentityServer.Services;
 using Notes.IdentityServer.Services.Interfaces;
+using Serilog;
 using System.Reflection;
+using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Extensions;
 
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.WithExceptionDetails()
+    .Enrich.WithClientIp()
+    .Enrich.WithRequestQuery()
+    .MinimumLevel.Information()
+    .WriteTo.Async(configure => configure.Console(LogEventLevel.Information,
+        "[{Timestamp:HH:mm:ss.fff zzz}][{Level:u3}] {SourceContext}{NewLine}" +
+        "{Message:lj}{NewLine}{Exception}{NewLine}")).CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,11 +85,15 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
+app.UseSerilogRequestLogging();
 app.UseSwagger();
 app.UseSwaggerUI(config =>
 {
@@ -114,8 +131,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception e)
     {
-        var logger = provider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(e, "An error occurred while app initialization");
+        Log.Fatal(e, "An error occurred while app initialization.");
         return;
     }
 }
