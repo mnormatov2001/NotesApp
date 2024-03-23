@@ -20,7 +20,7 @@ services:
 
 
   identity-server:
-    image: 'mnormatov2001/notes-identity-server-dev:latest'
+    image: 'mnormatov2001/notes-identity-server:latest'
     container_name: 'auth'
     hostname: auth.notes.com
     restart: unless-stopped
@@ -33,7 +33,7 @@ services:
       - notes-app
 
   notes-api:
-    image: 'mnormatov2001/notes-api-dev:latest'
+    image: 'mnormatov2001/notes-api:latest'
     container_name: 'api'
     hostname: api.notes.com
     restart: unless-stopped

@@ -56,7 +56,7 @@ RUN apt update && apt upgrade -y && \
     cp localhost.crt /etc/ssl/certs/ && \
     cp localhost.pem /etc/ssl/private/
 
-ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_ENVIRONMENT=Production
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 ENV Kestrel__Certificates__Default__Path=/etc/ssl/certs/localhost.crt
 ENV Kestrel__Certificates__Default__KeyPath=/etc/ssl/private/localhost.pem
